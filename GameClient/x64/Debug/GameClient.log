@@ -1,0 +1,49 @@
+﻿  Graphics.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(32): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(39): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(39): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(41): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(41): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(43): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  Source.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(32): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(39): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(39): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(41): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(41): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gameclient\graphics.h(43): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+  Generating Code...
+  GameClient.vcxproj -> C:\Users\VictorRomero\Documents\ENTI\3r\Xarxes\Cluedo\x64\Debug\GameClient.exe
