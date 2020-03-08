@@ -9,6 +9,9 @@ PlayerInfo::PlayerInfo()
 	lives = 3;
 }
 
+PlayerInfo::PlayerInfo(std::string _name) :
+name(_name), position(sf::Vector2i(0,0)), lives(3){}
+
 PlayerInfo::~PlayerInfo()
 {
 }

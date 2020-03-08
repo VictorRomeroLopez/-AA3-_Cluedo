@@ -27,8 +27,14 @@ int main()
 {
 	PlayerInfo playerInfo;
 	sf::TcpSocket serverSocket;
+	sf::Packet loginPacket;
 
 	if (!ManageConnectionToServer(serverSocket)) return 1;
+
+	std::string nick;
+	std::cin >> nick;
+	loginPacket << "LOGIN" << nick;
+	serverSocket.send(loginPacket);
 
 	Graphics g;
 	g.DrawDungeon();

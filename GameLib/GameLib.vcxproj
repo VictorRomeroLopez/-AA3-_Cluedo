@@ -144,11 +144,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Console.h" />
+    <ClInclude Include="Messages.h" />
     <ClInclude Include="PlayerInfo.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="Messages.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>

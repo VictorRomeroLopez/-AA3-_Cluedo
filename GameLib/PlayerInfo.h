@@ -8,5 +8,6 @@ class PlayerInfo
 	int lives;
 public:
 	PlayerInfo();
+	PlayerInfo(std::string);
 	~PlayerInfo();
 };
