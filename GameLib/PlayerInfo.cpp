@@ -7,10 +7,11 @@ PlayerInfo::PlayerInfo()
 	position.x = std::rand() % 10;
 	position.y = std::rand() % 10;
 	lives = 3;
+	color = Color::BLUE;
 }
 
 PlayerInfo::PlayerInfo(std::string _name) :
-name(_name), position(sf::Vector2i(0,0)), lives(3){}
+name(_name), position(sf::Vector2i(0,0)), lives(3), color(Color::BLUE){}
 
 PlayerInfo::~PlayerInfo()
 {
@@ -28,5 +29,5 @@ PlayerInfo::Color PlayerInfo::GetColor()
 
 unsigned short PlayerInfo::GetIdColor()
 {
-	return (unsigned short) color;
+	return static_cast<unsigned short>(color);
 }

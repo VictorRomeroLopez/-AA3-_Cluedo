@@ -63,7 +63,10 @@ int main()
 		joinPacket << "JOIN" << gameId << password;
 		serverSocket.send(joinPacket);
 		
-		serverSocket.receive(joinPacketRequest);
+		if (serverSocket.receive(joinPacketRequest) != sf::Socket::Status::Done) {
+			Utils::print("Something's not working");
+		}
+
 		joinPacketRequest >> headderRequest;
 		joinPacketRequest >> statusRequest;
 
@@ -72,11 +75,10 @@ int main()
 			for (int i = 0; i < numPlayersRequest; i++) {
 				std::string playerName;
 				unsigned short playerColor;
-				joinPacket >> playerName >> playerColor;
+				joinPacketRequest >> playerName >> playerColor;
 				std::cout << playerName << ' ' << playerColor << std::endl;
 			}
 		}
-		
 	}
 	else if (answer == 'c' || answer == 'C') 
 	{
