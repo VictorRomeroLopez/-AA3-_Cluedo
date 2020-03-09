@@ -4,7 +4,9 @@ LobbyRoom::LobbyRoom() {}
 
 //TODO: les idLobbyRoom encara no son randoms
 LobbyRoom::LobbyRoom(std::string _roomName, std::string _password, unsigned short _numPlayers) :
-	roomName(_roomName), password(_password), numPlayers(_numPlayers), idLobbyRoom(rand() % 600) {
+	roomName(_roomName), password(_password), numPlayers(_numPlayers) {
+	srand(time(NULL));
+	idLobbyRoom = rand() % 60000;
 }
 
 LobbyRoom::~LobbyRoom() {}

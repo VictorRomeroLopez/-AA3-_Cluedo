@@ -1,2 +1,9 @@
-﻿  LobbyRoom.cpp
+﻿  Console.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+  LobbyRoom.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameserver\lobbyroom.cpp(8): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Source.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameserver\source.cpp(104): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Generating Code...
   GameServer.vcxproj -> C:\Users\VictorRomero\Documents\ENTI\3r\Xarxes\[AA3]_Cluedo\x64\Debug\GameServer.exe

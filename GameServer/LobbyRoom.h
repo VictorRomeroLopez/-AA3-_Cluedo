@@ -4,7 +4,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstdio>
 #include <cstdlib>
+#include <ctime>
+
 
 class LobbyRoom
 {
@@ -25,7 +28,5 @@ public:
 	unsigned short GetIdLobbyRoom();
 
 	void AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo);
-
-
 };
 

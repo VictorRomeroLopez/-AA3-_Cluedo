@@ -10,8 +10,6 @@
 #include "Utils.h"
 #include "LobbyRoom.h"
 #include "Messages.h"
-#include <time.h>
-#include <stdlib.h>
 
 const std::string SERVER_IP = "127.0.0.1";
 const unsigned short SERVER_PORT = 50000;
@@ -100,7 +98,6 @@ void GenerateClientThread(sf::TcpSocket* socketListener, std::vector<LobbyRoom*>
 
 int main()
 {
-	srand(time(NULL));
 	sf::TcpListener listener;
 	sf::TcpSocket* socketListener = new sf::TcpSocket();
 	std::vector<LobbyRoom*>* lobbyRooms = new std::vector<LobbyRoom*>();
