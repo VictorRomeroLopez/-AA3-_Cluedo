@@ -47,11 +47,39 @@ int main()
 		std::cin >> answer;
 	} while (!IsCorrectAnswerRoom(answer));
 
-	if (answer == 'j' || answer == 'J')
-	{
+	if (answer == 'j' || answer == 'J'){
+		std::string gameId;
+		std::string password;
+		sf::Packet joinPacket;
+		sf::Packet joinPacketRequest;
+		std::string headderRequest;
+		bool statusRequest;
+		unsigned short numPlayersRequest;
 
+		std::cout << "Which room would you like to join?" << std::endl;
+		std::cin >> gameId;
+		std::cout << "Password: ";
+		std::cin >> password;
+		joinPacket << "JOIN" << gameId << password;
+		serverSocket.send(joinPacket);
+		
+		serverSocket.receive(joinPacketRequest);
+		joinPacketRequest >> headderRequest;
+		joinPacketRequest >> statusRequest;
+
+		if (statusRequest) {
+			joinPacketRequest >> numPlayersRequest;
+			for (int i = 0; i < numPlayersRequest; i++) {
+				std::string playerName;
+				unsigned short playerColor;
+				joinPacket >> playerName >> playerColor;
+				std::cout << playerName << ' ' << playerColor << std::endl;
+			}
+		}
+		
 	}
-	else if (answer == 'c' || answer == 'C') {
+	else if (answer == 'c' || answer == 'C') 
+	{
 
 		std::string lobbyRoomName;
 		std::string lobbyRoomPasswd;

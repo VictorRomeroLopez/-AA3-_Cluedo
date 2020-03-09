@@ -1,4 +1,6 @@
 ﻿  Source.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(15): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+  c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(6): note: see declaration of 'PlayerInfo::Color'
 c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\graphics.h(32): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
           [

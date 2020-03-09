@@ -46,6 +46,16 @@ Messages::Msg GetHeadder(sf::Packet& packet) {
 	return Messages::IsMessage(headder);
 }
 
+bool GetLobbyRoomWithId(unsigned short roomId, std::vector<LobbyRoom*>* rooms, LobbyRoom* room) {
+	for (int i = 0; i < rooms->size(); i++) {
+		if (rooms->at(i)->GetIdLobbyRoom() == roomId) {
+			room = rooms->at(i);
+			return true;
+		}
+	}
+	return false;
+}
+
 void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 	PlayerInfo* clientInfo = new PlayerInfo();
 	sf::Socket::Status clientStatus;
@@ -67,8 +77,30 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				clientInfo = new PlayerInfo(clientName);
 				break;
 			}
-			case Messages::Msg::JOIN:
+			case Messages::Msg::JOIN: {
+				unsigned short lobbyRoomId;
+				std::string lobbyRoomPasswd;
+				LobbyRoom* lobbyRoomRequested = new LobbyRoom();
+				sf::Packet answerPacket;
+
+				clientPacket >> lobbyRoomId >> lobbyRoomPasswd;
+				answerPacket << "JOIN_RESPONSE";
+				if (GetLobbyRoomWithId(lobbyRoomId, rooms, lobbyRoomRequested)) {
+					if (lobbyRoomRequested->GetPasswd() == lobbyRoomPasswd) {
+						answerPacket << true;
+						answerPacket << lobbyRoomRequested->GetInfoPlayersOnRoom().size();
+						for (int i = 0; i < lobbyRoomRequested->GetInfoPlayersOnRoom().size(); i++) {
+							answerPacket << lobbyRoomRequested->GetInfoPlayersOnRoom()[i]->GetName() << lobbyRoomRequested->GetInfoPlayersOnRoom()[i]->GetIdColor();
+						}
+					}
+					else
+					{
+						answerPacket << false;
+					}
+				}
+				socket->send(answerPacket);
 				break;
+			}
 			case Messages::Msg::CREATE: {
 				std::string lobbyRoomName;
 				std::string lobbyRoomPasswd;

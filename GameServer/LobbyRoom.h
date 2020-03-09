@@ -26,6 +26,8 @@ public:
 	std::string GetRoomName();
 	unsigned short GetNumPlayers();
 	unsigned short GetIdLobbyRoom();
+	std::string GetPasswd();
+	std::vector<PlayerInfo*> GetInfoPlayersOnRoom();
 
 	void AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo);
 };

@@ -26,6 +26,16 @@ unsigned short LobbyRoom::GetIdLobbyRoom()
 	return idLobbyRoom;
 }
 
+std::string LobbyRoom::GetPasswd()
+{
+	return password;
+}
+
+std::vector<PlayerInfo*> LobbyRoom::GetInfoPlayersOnRoom()
+{
+	return playerInfo;
+}
+
 void LobbyRoom::AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo)
 {
 	playersSocket.push_back(newPlayer);

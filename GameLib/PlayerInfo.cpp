@@ -15,3 +15,18 @@ name(_name), position(sf::Vector2i(0,0)), lives(3){}
 PlayerInfo::~PlayerInfo()
 {
 }
+
+std::string PlayerInfo::GetName()
+{
+	return name;
+}
+
+PlayerInfo::Color PlayerInfo::GetColor()
+{
+	return color;
+}
+
+unsigned short PlayerInfo::GetIdColor()
+{
+	return (unsigned short) color;
+}
