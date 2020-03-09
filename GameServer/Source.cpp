@@ -10,6 +10,8 @@
 #include "Utils.h"
 #include "LobbyRoom.h"
 #include "Messages.h"
+#include <time.h>
+#include <stdlib.h>
 
 const std::string SERVER_IP = "127.0.0.1";
 const unsigned short SERVER_PORT = 50000;
@@ -46,19 +48,17 @@ Messages::Msg GetHeadder(sf::Packet& packet) {
 	return Messages::IsMessage(headder);
 }
 
-void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom>* rooms) {
-	PlayerInfo clientInfo;
+void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
+	PlayerInfo* clientInfo = new PlayerInfo();
 	sf::Socket::Status clientStatus;
-	Utils::print("Client Loop");
 	bool clientConnected = true;
-	//TODO: cambiar la condicion del while
 
 	while (clientConnected) {
-		Utils::print("Inside client Loop");
 		sf::Packet clientPacket;
 		clientStatus = socket->receive(clientPacket);
 
 		if (clientStatus == sf::Socket::Status::Disconnected) {
+			//TODO:	treure el jugador de tots els llocs que s'haigi de treure
 			clientConnected = false;
 		}
 
@@ -66,13 +66,21 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom>* rooms) {
 			case Messages::Msg::LOGIN: {
 				std::string clientName;
 				clientPacket >> clientName;
-				clientInfo = PlayerInfo(clientName);
+				clientInfo = new PlayerInfo(clientName);
 				break;
 			}
 			case Messages::Msg::JOIN:
 				break;
-			case Messages::Msg::CREATE:
+			case Messages::Msg::CREATE: {
+				std::string lobbyRoomName;
+				std::string lobbyRoomPasswd;
+				unsigned short lobbyRoomNumPlayers;
+				clientPacket >> lobbyRoomName >> lobbyRoomPasswd >> lobbyRoomNumPlayers;
+				LobbyRoom* newLobbyRoom = new LobbyRoom(lobbyRoomName, lobbyRoomPasswd, lobbyRoomNumPlayers);
+				newLobbyRoom->AddPlayer(socket, clientInfo);
+				rooms->push_back(newLobbyRoom);
 				break;
+			}
 			case Messages::Msg::COLOR:
 				break;
 			case Messages::Msg::READY:
@@ -85,22 +93,23 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom>* rooms) {
 	}
 }
 
-void GenerateClientThread(sf::TcpSocket* socketListener, std::vector<LobbyRoom>* rooms) {
+void GenerateClientThread(sf::TcpSocket* socketListener, std::vector<LobbyRoom*>* rooms) {
 	std::thread clientThread(&ClientLoop, socketListener, rooms);
 	clientThread.detach();
 }
 
 int main()
 {
+	srand(time(NULL));
 	sf::TcpListener listener;
 	sf::TcpSocket* socketListener = new sf::TcpSocket();
-	std::vector<LobbyRoom>* lobbyRooms = new std::vector<LobbyRoom>();
+	std::vector<LobbyRoom*>* lobbyRooms = new std::vector<LobbyRoom*>();
 
 	bool running = true;
 
 	if (!InitListener(listener)) return 1;
 
-	Console::initConsole(running);
+	Console::initConsole(running, *lobbyRooms);
 
 	while (running) {
 		if (ManageListenerAccept(listener, socketListener)) {
