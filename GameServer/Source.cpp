@@ -7,11 +7,11 @@
 #include <string>
 #include <SFML\Graphics.hpp>
 #include <SFML\Network.hpp>
-#include <PlayerInfo.h>
-#include "Console.h"
-#include "Utils.h"
-#include "LobbyRoom.h"
+#include <Console.h>
 #include "Messages.h"
+
+class Utils;
+class LobbyRoom;
 
 const std::string SERVER_IP = "127.0.0.1";
 const unsigned short SERVER_PORT = 50000;
@@ -48,10 +48,10 @@ Messages::Msg GetHeadder(sf::Packet& packet) {
 	return Messages::IsMessage(headder);
 }
 
-bool GetLobbyRoomWithId(unsigned short roomId, std::vector<LobbyRoom*>* rooms, LobbyRoom& room) {
+bool GetLobbyRoomWithId(unsigned short roomId, std::vector<LobbyRoom*>* rooms, LobbyRoom** room) {
 	for (int i = 0; i < rooms->size(); i++) {
 		if (rooms->at(i)->GetIdLobbyRoom() == roomId) {
-			room = *rooms->at(i);
+			*room = rooms->at(i);
 			return true;
 		}
 	}
@@ -82,30 +82,41 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 			case Messages::Msg::JOIN: {
 				std::string lobbyRoomId;
 				std::string lobbyRoomPasswd;
-				LobbyRoom lobbyRoomRequested;
+				LobbyRoom** lobbyRoomRequested = (new LobbyRoom*());
+
 				sf::Packet answerPacket;
+				bool joinResponseStatus;
 
 				clientPacket >> lobbyRoomId >> lobbyRoomPasswd;
 				answerPacket << "JOIN_RESPONSE";
 
 				if (GetLobbyRoomWithId((unsigned short)std::stoul(lobbyRoomId, nullptr, 0), rooms, lobbyRoomRequested)) {
-					if (lobbyRoomRequested.GetPasswd() == lobbyRoomPasswd) {
-						answerPacket << true;
-						unsigned short numPlayersOnRoom = lobbyRoomRequested.GetInfoPlayersOnRoom().size();
+					if ((*lobbyRoomRequested)->GetPasswd() == lobbyRoomPasswd) {
+						joinResponseStatus = true;
+						answerPacket << joinResponseStatus;
+						unsigned short numPlayersOnRoom = (*lobbyRoomRequested)->GetInfoPlayersOnRoom().size();
 						answerPacket << numPlayersOnRoom;
-						for (int i = 0; i < lobbyRoomRequested.GetInfoPlayersOnRoom().size(); i++) {
-							answerPacket << lobbyRoomRequested.GetInfoPlayersOnRoom()[i]->GetName() << lobbyRoomRequested.GetInfoPlayersOnRoom()[i]->GetIdColor();
+						for (int i = 0; i < (*lobbyRoomRequested)->GetInfoPlayersOnRoom().size(); i++) {
+							answerPacket << (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetName() << (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetIdColor();
 						}
 					}
 					else
 					{
-						answerPacket << false;
+						joinResponseStatus = false;
+						answerPacket << joinResponseStatus;
 					}
 				}
 
 				if (socket->send(answerPacket) != sf::Socket::Status::Done) {
 					Utils::print("Something went wrong!");
+					break;
 				}
+
+				if (joinResponseStatus) {
+					(*lobbyRoomRequested)->SendDataToOtherPlayers(clientInfo);
+					(*lobbyRoomRequested)->AddPlayer(socket, clientInfo);
+				}
+
 				break;
 			}
 			case Messages::Msg::CREATE: {

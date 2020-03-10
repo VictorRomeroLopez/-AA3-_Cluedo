@@ -22,7 +22,7 @@
     <ProjectGuid>{CA0BC20B-DACD-41B3-B8B0-4356B380A206}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GameLib</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -143,11 +143,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="LobbyRoom.h" />
     <ClInclude Include="Messages.h" />
     <ClInclude Include="PlayerInfo.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="LobbyRoom.cpp" />
     <ClCompile Include="Messages.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="Utils.cpp" />

@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML\Network.hpp>
-#include <PlayerInfo.h>
+#include "PlayerInfo.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -28,6 +28,7 @@ public:
 	unsigned short GetIdLobbyRoom();
 	std::string GetPasswd();
 	std::vector<PlayerInfo*> GetInfoPlayersOnRoom();
+	void SendDataToOtherPlayers(PlayerInfo* _playerInfo);
 
 	void AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo);
 };

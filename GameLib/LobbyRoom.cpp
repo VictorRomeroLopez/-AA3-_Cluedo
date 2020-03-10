@@ -36,6 +36,16 @@ std::vector<PlayerInfo*> LobbyRoom::GetInfoPlayersOnRoom()
 	return playerInfo;
 }
 
+void LobbyRoom::SendDataToOtherPlayers(PlayerInfo* _playerInfo)
+{
+	for (int i = 0; i < playersSocket.size(); i++) {
+		sf::Packet packet;
+		packet << "P_JOINED" << _playerInfo->GetName() << _playerInfo->GetIdColor();
+
+		playersSocket[i]->send(packet);
+	}
+}
+
 void LobbyRoom::AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo)
 {
 	playersSocket.push_back(newPlayer);

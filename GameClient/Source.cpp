@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include "Graphics.h"
 #include "Utils.h"
+#include <LobbyRoom.h>
 
 const sf::IpAddress SERVER_IP = sf::IpAddress("127.0.0.1");
 const unsigned short SERVER_PORT = 50000;
@@ -46,6 +47,8 @@ int main()
 		std::cout << "Would you like to Join a room or create a new one? (J/C)" << std::endl;
 		std::cin >> answer;
 	} while (!IsCorrectAnswerRoom(answer));
+
+	LobbyRoom lobbyRoomJoined;
 
 	if (answer == 'j' || answer == 'J'){
 		std::string gameId;
