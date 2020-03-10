@@ -23,10 +23,12 @@ public:
 
 	PlayerInfo();
 	PlayerInfo(std::string);
+	PlayerInfo(std::string, unsigned short);
 	~PlayerInfo();
 
 	std::string GetName();
 	Color GetColor();
 	unsigned short GetIdColor();
+	Color IdColorToColor(unsigned short);
 
 };

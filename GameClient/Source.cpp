@@ -5,10 +5,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
 #include <fcntl.h>
 #include "Graphics.h"
 #include "Utils.h"
 #include <LobbyRoom.h>
+#include <Messages.h>
 
 const sf::IpAddress SERVER_IP = sf::IpAddress("127.0.0.1");
 const unsigned short SERVER_PORT = 50000;
@@ -22,6 +24,47 @@ bool ManageConnectionToServer(sf::TcpSocket& serverSocket) {
 	}
 	Utils::print("Succesfully connected to server!");
 	return true;
+}
+
+void ReceivesManager(sf::TcpSocket& serverSocket) {
+	bool connectedToServer = true;
+
+	while (connectedToServer) {
+		sf::Packet receivePacket;
+		sf::Socket::Status serverStatus;
+
+		serverStatus = serverSocket.receive(receivePacket);
+
+		if (serverStatus == sf::Socket::Status::Disconnected) {
+			Utils::print("Server has been disconected!");
+			connectedToServer = false;
+		}
+		else if (serverStatus != sf::Socket::Status::Done) {
+			Utils::print("Something went wrong trying to receive a packet from server");
+			continue;
+		}
+
+		std::string headder;
+
+		receivePacket >> headder;
+
+		switch (Messages::IsMessage(headder)) {
+		case Messages::Msg::CREATE_RESPONSE: {
+			bool createResponse;
+			receivePacket >> createResponse;
+			if (createResponse)
+			{
+				Utils::print("Lobby Created correctly");
+			}
+			else
+			{
+				Utils::print("Lobby Created correctly");
+			}
+			break;
+		}
+		}
+
+	}
 }
 
 bool IsCorrectAnswerRoom(char answer) {
@@ -40,15 +83,21 @@ int main()
 	std::cout << "Type your nickname: ";
 	std::cin >> nick;
 	loginPacket << "LOGIN" << nick;
+	std::thread receiveThread(&ReceivesManager, std::ref(serverSocket));
+	receiveThread.detach();
+
 	serverSocket.send(loginPacket);
 
 	char answer;
 	do {
-		std::cout << "Would you like to Join a room or create a new one? (J/C)" << std::endl;
+		std::cout << "Would you like to Join a room or Create a new one? (J/C)" << std::endl;
 		std::cin >> answer;
 	} while (!IsCorrectAnswerRoom(answer));
 
-	LobbyRoom lobbyRoomJoined;
+	unsigned short maxPlayers;
+	unsigned short currentPlayersJoined;
+	std::vector<PlayerInfo> players;
+	bool startGame = false;
 
 	if (answer == 'j' || answer == 'J'){
 		std::string gameId;
@@ -74,8 +123,11 @@ int main()
 		joinPacketRequest >> statusRequest;
 
 		if (statusRequest) {
+			joinPacketRequest >> startGame;
 			joinPacketRequest >> numPlayersRequest;
+
 			for (int i = 0; i < numPlayersRequest; i++) {
+
 				std::string playerName;
 				unsigned short playerColor;
 				joinPacketRequest >> playerName >> playerColor;
@@ -85,7 +137,6 @@ int main()
 	}
 	else if (answer == 'c' || answer == 'C') 
 	{
-
 		std::string lobbyRoomName;
 		std::string lobbyRoomPasswd;
 		unsigned short numPlayers;
@@ -108,6 +159,28 @@ int main()
 		sf::Packet createLobbyRoomPacket;
 		createLobbyRoomPacket << "CREATE" << lobbyRoomName << lobbyRoomPasswd << numPlayers;
 		serverSocket.send(createLobbyRoomPacket);
+	}
+
+	if (!startGame) {
+		Utils::print("Waiting for other players...");
+	}
+
+	//Mentre no son tots els jugadors a la partida
+	while (!startGame) {
+
+		sf::Packet playerJoinPacket;
+		std::string headder;
+		std::string newPlayerName;
+		unsigned short newPlayerColor;
+
+		if (serverSocket.receive(playerJoinPacket) != sf::Socket::Status::Done) {
+			Utils::print("Something went wrong trying to receive the packet!");
+			continue;
+		}
+
+		playerJoinPacket >> headder >> startGame >> newPlayerName >> newPlayerColor;
+		players.push_back(PlayerInfo(newPlayerName, newPlayerColor));
+		Utils::print(newPlayerName + " has joined the room!");
 	}
 
 	Graphics g;

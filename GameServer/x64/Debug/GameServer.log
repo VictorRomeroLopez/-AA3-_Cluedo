@@ -1,6 +1,6 @@
 ﻿  Source.cpp
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(15): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
-  c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(6): note: see declaration of 'PlayerInfo::Color'
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameserver\source.cpp(98): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data
-  GameServer.vcxproj -> C:\Users\VictorRomero\Documents\ENTI\3r\Xarxes\[AA3]_Cluedo\x64\Debug\GameServer.exe
+c:\users\victor.romero\documents\enti\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+c:\users\victor.romero\documents\enti\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(15): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+  c:\users\victor.romero\documents\enti\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(6): note: see declaration of 'PlayerInfo::Color'
+c:\users\victor.romero\documents\enti\xarxes\[aa3]_cluedo\gameserver\source.cpp(97): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data
+  GameServer.vcxproj -> C:\Users\victor.romero\Documents\ENTI\Xarxes\[AA3]_Cluedo\x64\Debug\GameServer.exe
