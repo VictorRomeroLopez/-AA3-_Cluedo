@@ -2,7 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Network.hpp>
 #include <array>
+
 #define SIZE 20.f
 ///TAMAÑO EN PX DE LA VENTANA
 #define W_WINDOW_PX 800
@@ -61,6 +63,7 @@ class Graphics
 {
 	std::array<Sala, NUM_SALAS> salas;
 	Sala centroMensajes;
+
 public:
 	Graphics();
 	void DrawDungeon();

@@ -16,6 +16,92 @@ const sf::IpAddress SERVER_IP = sf::IpAddress("127.0.0.1");
 const unsigned short SERVER_PORT = 50000;
 const sf::Time SERVER_TIMEOUT = sf::seconds(5);
 
+void DrawChat(std::vector<std::string>& aMensajes) {
+
+	sf::Vector2i screenDimensions(800, 600);
+	sf::RenderWindow window(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
+	sf::Font font;
+	sf::String mensaje;
+	font.loadFromFile(FONT_PATH);
+
+	mensaje = ">";
+
+	sf::Text chattingText(mensaje, font, 14);
+	chattingText.setFillColor(sf::Color(0, 160, 0));
+	chattingText.setStyle(sf::Text::Bold);
+
+	sf::Text text(mensaje, font, 14);
+	text.setFillColor(sf::Color(0, 160, 0));
+	text.setStyle(sf::Text::Bold);
+	text.setPosition(0, 560);
+
+	sf::RectangleShape separator(sf::Vector2f(800, 5));
+	separator.setFillColor(sf::Color(200, 200, 200, 255));
+	separator.setPosition(0, 550);
+
+	//Aqui va el listener per els missatges, pero com tenim tots els receives al client ho implementarem alla 
+
+	while (window.isOpen())
+	{
+		sf::Event evento;
+		while (window.pollEvent(evento))
+		{
+			switch (evento.type) {
+			case sf::Event::Closed:
+				window.close();
+				break;
+
+			case sf::Event::KeyPressed:
+				if (evento.key.code == sf::Keyboard::Escape) {
+					window.close();
+				}
+				else if (evento.key.code == sf::Keyboard::Return)
+				{
+					sf::Packet packet;
+					std::string packetToSend = mensaje;
+					packet << packetToSend;
+
+					//send packet to server
+
+					aMensajes.push_back(mensaje);
+
+					if (aMensajes.size() > 25)
+					{
+						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
+					}
+
+					mensaje = ">";
+				}
+				break;
+
+			case sf::Event::TextEntered:
+				if (evento.text.unicode >= 32 && evento.text.unicode <= 126)
+					mensaje += (char)evento.text.unicode;
+				else if (evento.text.unicode == 8 && mensaje.getSize() > 0)
+					mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
+				break;
+			}
+		}
+
+		window.draw(separator);
+
+		for (size_t i = 0; i < aMensajes.size(); i++)
+		{
+			std::string chatting = aMensajes[i];
+			chattingText.setPosition(sf::Vector2f(0, 20 * i));
+			chattingText.setString(chatting);
+			window.draw(chattingText);
+		}
+
+		std::string mensaje_ = mensaje + "_";
+		text.setString(mensaje_);
+		window.draw(text);
+
+		window.display();
+		window.clear();
+	}
+}
+
 bool ManageConnectionToServer(sf::TcpSocket& serverSocket) {
 
 	if (serverSocket.connect(SERVER_IP, SERVER_PORT, SERVER_TIMEOUT) != sf::Socket::Status::Done) {
@@ -26,7 +112,7 @@ bool ManageConnectionToServer(sf::TcpSocket& serverSocket) {
 	return true;
 }
 
-void ReceivesManager(sf::TcpSocket& serverSocket) {
+void ReceivesManager(sf::TcpSocket& serverSocket, bool& startGame, std::vector<PlayerInfo>& players) {
 	bool connectedToServer = true;
 
 	while (connectedToServer) {
@@ -58,12 +144,40 @@ void ReceivesManager(sf::TcpSocket& serverSocket) {
 			}
 			else
 			{
-				Utils::print("Lobby Created correctly");
+				Utils::print("Something went wrong trying to create a lobby");
 			}
 			break;
 		}
-		}
+		case Messages::Msg::JOIN_RESPONSE: {
 
+			bool statusRequest;
+			unsigned short numPlayersRequest;
+
+			receivePacket >> statusRequest;
+
+			if (statusRequest) {
+				receivePacket >> startGame;
+				receivePacket >> numPlayersRequest;
+
+				for (int i = 0; i < numPlayersRequest; i++) {
+
+					std::string playerName;
+					unsigned short playerColor;
+					receivePacket >> playerName >> playerColor;
+					std::cout << playerName << ' ' << playerColor << std::endl;
+				}
+			}
+			break;
+		}
+		case Messages::Msg::P_JOINED:{
+			std::string newPlayerName;
+			unsigned short newPlayerColor;
+
+			receivePacket >> startGame >> newPlayerName >> newPlayerColor;
+			players.push_back(PlayerInfo(newPlayerName, newPlayerColor));
+			Utils::print(newPlayerName + " has joined the room!");
+		}
+		}
 	}
 }
 
@@ -76,14 +190,20 @@ int main()
 	PlayerInfo playerInfo;
 	sf::TcpSocket serverSocket;
 	sf::Packet loginPacket;
-
-	if (!ManageConnectionToServer(serverSocket)) return 1;
+	bool startGame = false;
+	unsigned short maxPlayers;
+	unsigned short currentPlayersJoined;
+	std::vector<PlayerInfo> players;
+	std::vector<std::string> aMensajes;
 
 	std::string nick;
 	std::cout << "Type your nickname: ";
 	std::cin >> nick;
 	loginPacket << "LOGIN" << nick;
-	std::thread receiveThread(&ReceivesManager, std::ref(serverSocket));
+
+	if (!ManageConnectionToServer(serverSocket)) return 1;
+
+	std::thread receiveThread(&ReceivesManager, std::ref(serverSocket), std::ref(startGame), std::ref(players));
 	receiveThread.detach();
 
 	serverSocket.send(loginPacket);
@@ -94,10 +214,6 @@ int main()
 		std::cin >> answer;
 	} while (!IsCorrectAnswerRoom(answer));
 
-	unsigned short maxPlayers;
-	unsigned short currentPlayersJoined;
-	std::vector<PlayerInfo> players;
-	bool startGame = false;
 
 	if (answer == 'j' || answer == 'J'){
 		std::string gameId;
@@ -114,26 +230,6 @@ int main()
 		std::cin >> password;
 		joinPacket << "JOIN" << gameId << password;
 		serverSocket.send(joinPacket);
-		
-		if (serverSocket.receive(joinPacketRequest) != sf::Socket::Status::Done) {
-			Utils::print("Something's not working");
-		}
-
-		joinPacketRequest >> headderRequest;
-		joinPacketRequest >> statusRequest;
-
-		if (statusRequest) {
-			joinPacketRequest >> startGame;
-			joinPacketRequest >> numPlayersRequest;
-
-			for (int i = 0; i < numPlayersRequest; i++) {
-
-				std::string playerName;
-				unsigned short playerColor;
-				joinPacketRequest >> playerName >> playerColor;
-				std::cout << playerName << ' ' << playerColor << std::endl;
-			}
-		}
 	}
 	else if (answer == 'c' || answer == 'C') 
 	{
@@ -165,22 +261,11 @@ int main()
 		Utils::print("Waiting for other players...");
 	}
 
+	std::thread chatThread(&DrawChat, std::ref(aMensajes));
+
 	//Mentre no son tots els jugadors a la partida
 	while (!startGame) {
 
-		sf::Packet playerJoinPacket;
-		std::string headder;
-		std::string newPlayerName;
-		unsigned short newPlayerColor;
-
-		if (serverSocket.receive(playerJoinPacket) != sf::Socket::Status::Done) {
-			Utils::print("Something went wrong trying to receive the packet!");
-			continue;
-		}
-
-		playerJoinPacket >> headder >> startGame >> newPlayerName >> newPlayerColor;
-		players.push_back(PlayerInfo(newPlayerName, newPlayerColor));
-		Utils::print(newPlayerName + " has joined the room!");
 	}
 
 	Graphics g;

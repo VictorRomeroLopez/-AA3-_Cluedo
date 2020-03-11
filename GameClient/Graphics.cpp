@@ -110,7 +110,6 @@ void Graphics::DrawDungeon()
 	}
 }
 
-
 Graphics::~Graphics()
 {
 }

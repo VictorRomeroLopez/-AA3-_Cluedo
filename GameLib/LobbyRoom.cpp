@@ -2,7 +2,6 @@
 
 LobbyRoom::LobbyRoom() {}
 
-//TODO: les idLobbyRoom encara no son randoms
 LobbyRoom::LobbyRoom(std::string _roomName, std::string _password, unsigned short _numPlayers) :
 	roomName(_roomName), password(_password), numPlayers(_numPlayers) {
 	srand(time(NULL));
@@ -40,10 +39,15 @@ void LobbyRoom::SendDataToOtherPlayers(PlayerInfo* _playerInfo)
 {
 	for (int i = 0; i < playersSocket.size(); i++) {
 		sf::Packet packet;
-		packet << "P_JOINED" << _playerInfo->GetName() << _playerInfo->GetIdColor();
+		packet << "P_JOINED" << IsLobbyFull() << _playerInfo->GetName() << _playerInfo->GetIdColor();
 
 		playersSocket[i]->send(packet);
 	}
+}
+
+bool LobbyRoom::IsLobbyFull()
+{
+	return (playerInfo.size() + 1) == numPlayers;
 }
 
 void LobbyRoom::AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo)

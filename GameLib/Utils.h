@@ -5,7 +5,7 @@
 static class Utils
 {
 public:
-	static void print(std::string text);
+	static void print(std::string text); 
 	static std::string intToString(int intToParse);
 };
 

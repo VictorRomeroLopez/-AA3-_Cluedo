@@ -37,7 +37,7 @@ bool ManageListenerAccept(sf::TcpListener& listener, sf::TcpSocket* socket) {
 	}
 	else
 	{
-		Utils::print("Conection accepted on IP: " + socket->getRemoteAddress().toString());
+		Utils::print("Conection accepted on IP: " + socket->getRemoteAddress().toString() + " " + std::to_string(socket->getRemotePort()));
 		return true;
 	}
 }
@@ -94,10 +94,14 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 					if ((*lobbyRoomRequested)->GetPasswd() == lobbyRoomPasswd) {
 						joinResponseStatus = true;
 						answerPacket << joinResponseStatus;
+						bool isLobbyFull = (*lobbyRoomRequested)->IsLobbyFull();
+						answerPacket << isLobbyFull;
 						unsigned short numPlayersOnRoom = (*lobbyRoomRequested)->GetInfoPlayersOnRoom().size();
 						answerPacket << numPlayersOnRoom;
 						for (int i = 0; i < (*lobbyRoomRequested)->GetInfoPlayersOnRoom().size(); i++) {
-							answerPacket << (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetName() << (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetIdColor();
+							std::string name = (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetName();
+							unsigned short color = (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetIdColor();
+							answerPacket << name << color;
 						}
 					}
 					else
@@ -149,7 +153,6 @@ void GenerateClientThread(sf::TcpSocket* socketListener, std::vector<LobbyRoom*>
 int main()
 {
 	sf::TcpListener listener;
-	sf::TcpSocket* socketListener = new sf::TcpSocket();
 	std::vector<LobbyRoom*>* lobbyRooms = new std::vector<LobbyRoom*>();
 
 	bool running = true;
@@ -159,6 +162,7 @@ int main()
 	Console::initConsole(running, *lobbyRooms);
 
 	while (running) {
+		sf::TcpSocket* socketListener = new sf::TcpSocket();
 		if (ManageListenerAccept(listener, socketListener)) {
 			GenerateClientThread(socketListener, lobbyRooms);
 		}
