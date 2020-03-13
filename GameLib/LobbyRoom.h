@@ -29,6 +29,7 @@ public:
 	std::string GetPasswd();
 	std::vector<PlayerInfo*> GetInfoPlayersOnRoom();
 	void SendDataToOtherPlayers(PlayerInfo* _playerInfo);
+	void SendMessageToOtherPlayers(std::string _nick, std::string _message);
 	bool IsLobbyFull();
 
 	void AddPlayer(sf::TcpSocket* newPlayer, PlayerInfo* newPlayerInfo);

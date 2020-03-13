@@ -61,6 +61,7 @@ bool GetLobbyRoomWithId(unsigned short roomId, std::vector<LobbyRoom*>* rooms, L
 void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 	PlayerInfo* clientInfo = new PlayerInfo();
 	sf::Socket::Status clientStatus;
+	LobbyRoom** lobbyRoomRequested = (new LobbyRoom * ());
 	bool clientConnected = true;
 
 	while (clientConnected) {
@@ -82,7 +83,6 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 			case Messages::Msg::JOIN: {
 				std::string lobbyRoomId;
 				std::string lobbyRoomPasswd;
-				LobbyRoom** lobbyRoomRequested = (new LobbyRoom*());
 
 				sf::Packet answerPacket;
 				bool joinResponseStatus;
@@ -129,15 +129,22 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				unsigned short lobbyRoomNumPlayers;
 				clientPacket >> lobbyRoomName >> lobbyRoomPasswd >> lobbyRoomNumPlayers;
 				LobbyRoom* newLobbyRoom = new LobbyRoom(lobbyRoomName, lobbyRoomPasswd, lobbyRoomNumPlayers);
+				lobbyRoomRequested = &newLobbyRoom;
 				newLobbyRoom->AddPlayer(socket, clientInfo);
 				rooms->push_back(newLobbyRoom);
+				break;
+			}
+			case Messages::Msg::MSG: {
+				std::string _nick;
+				std::string _message;
+
+				clientPacket >> _nick >> _message;
+				(*lobbyRoomRequested)->SendMessageToOtherPlayers(_nick, _message);
 				break;
 			}
 			case Messages::Msg::COLOR:
 				break;
 			case Messages::Msg::READY:
-				break;
-			case Messages::Msg::MSG:
 				break;
 			case Messages::Msg::REFRESH:
 				break;

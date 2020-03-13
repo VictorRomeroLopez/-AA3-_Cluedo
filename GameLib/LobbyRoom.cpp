@@ -45,6 +45,15 @@ void LobbyRoom::SendDataToOtherPlayers(PlayerInfo* _playerInfo)
 	}
 }
 
+void LobbyRoom::SendMessageToOtherPlayers(std::string _nick, std::string _message) {
+	for (int i = 0; i < playersSocket.size(); i++) {
+		sf::Packet packet;
+		packet << "MSG" << _nick << _message;
+
+		playersSocket[i]->send(packet);
+	}
+}
+
 bool LobbyRoom::IsLobbyFull()
 {
 	return (playerInfo.size() + 1) == numPlayers;

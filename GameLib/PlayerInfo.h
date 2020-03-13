@@ -27,7 +27,9 @@ public:
 	~PlayerInfo();
 
 	std::string GetName();
+	void SetName(std::string _name);
 	Color GetColor();
+	void SetColor(Color _color);
 	unsigned short GetIdColor();
 	Color IdColorToColor(unsigned short);
 

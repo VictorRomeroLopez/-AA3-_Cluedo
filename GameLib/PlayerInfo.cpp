@@ -24,9 +24,17 @@ std::string PlayerInfo::GetName()
 	return name;
 }
 
+void PlayerInfo::SetName(std::string _name) {
+	name = _name;
+}
+
 PlayerInfo::Color PlayerInfo::GetColor()
 {
 	return color;
+}
+
+void PlayerInfo::SetColor(PlayerInfo::Color _color) {
+	color = _color;
 }
 
 unsigned short PlayerInfo::GetIdColor()

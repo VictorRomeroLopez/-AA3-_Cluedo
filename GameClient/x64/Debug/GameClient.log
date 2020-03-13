@@ -24,13 +24,13 @@ c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\graphics.
               T=float
           ]
 c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(91): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(88): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
           with
           [
               T=float
           ]
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(194): warning C4101: 'maxPlayers': unreferenced local variable
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(195): warning C4101: 'currentPlayersJoined': unreferenced local variable
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(224): warning C4101: 'statusRequest': unreferenced local variable
-c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(225): warning C4101: 'numPlayersRequest': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(204): warning C4101: 'maxPlayers': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(205): warning C4101: 'currentPlayersJoined': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(234): warning C4101: 'statusRequest': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(235): warning C4101: 'numPlayersRequest': unreferenced local variable
   GameClient.vcxproj -> C:\Users\VictorRomero\Documents\ENTI\3r\Xarxes\[AA3]_Cluedo\x64\Debug\GameClient.exe

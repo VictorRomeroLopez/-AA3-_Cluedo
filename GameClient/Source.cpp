@@ -12,12 +12,15 @@
 #include <LobbyRoom.h>
 #include <Messages.h>
 
-
 const sf::IpAddress SERVER_IP = sf::IpAddress("127.0.0.1");
 const unsigned short SERVER_PORT = 50000;
 const sf::Time SERVER_TIMEOUT = sf::seconds(5);
 
-void DrawChat(std::vector<std::string>& aMensajes) {
+void GetChatCommand(std::string _message) {
+
+}
+
+void DrawChat(sf::TcpSocket& serverSocket, PlayerInfo& _playerInfo, std::vector<std::string>& aMensajes) {
 
 	sf::Vector2i screenDimensions(800, 600);
 	sf::RenderWindow window(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
@@ -25,7 +28,7 @@ void DrawChat(std::vector<std::string>& aMensajes) {
 	sf::String mensaje;
 	font.loadFromFile(FONT_PATH);
 
-	mensaje = ">";
+	mensaje = "";
 
 	sf::Text chattingText(mensaje, font, 14);
 	chattingText.setFillColor(sf::Color(0, 160, 0));
@@ -60,18 +63,15 @@ void DrawChat(std::vector<std::string>& aMensajes) {
 				{
 					sf::Packet packet;
 					std::string packetToSend = mensaje;
-					packet << packetToSend;
-
-					//send packet to server
-
-					aMensajes.push_back(mensaje);
-
-					if (aMensajes.size() > 25)
-					{
-						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
+					if (mensaje[0] == '\\') {
+												
+					}
+					else {
+						packet << "MSG" << _playerInfo.GetName() << packetToSend;
+						serverSocket.send(packet);
 					}
 
-					mensaje = ">";
+					mensaje = "";
 				}
 				break;
 
@@ -113,7 +113,7 @@ bool ManageConnectionToServer(sf::TcpSocket& serverSocket) {
 	return true;
 }
 
-void ReceivesManager(sf::TcpSocket& serverSocket, bool& startGame, std::vector<PlayerInfo>& players) {
+void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool& startGame, std::vector<PlayerInfo>& players, std::vector<std::string>& aMensajes) {
 	bool connectedToServer = true;
 
 	while (connectedToServer) {
@@ -178,6 +178,19 @@ void ReceivesManager(sf::TcpSocket& serverSocket, bool& startGame, std::vector<P
 			players.push_back(PlayerInfo(newPlayerName, newPlayerColor));
 			Utils::print(newPlayerName + " has joined the room!");
 		}
+		case Messages::Msg::MSG:{
+
+			std::string nickName;
+			std::string message;
+
+			receivePacket >> nickName >> message;
+			aMensajes.push_back(nickName + "> " + message);
+
+			if (aMensajes.size() > 25)
+				aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
+
+			break;
+		}
 		}
 	}
 }
@@ -201,10 +214,11 @@ int main()
 	std::cout << "Type your nickname: ";
 	std::cin >> nick;
 	loginPacket << "LOGIN" << nick;
+	playerInfo.SetName(nick);
 
 	if (!ManageConnectionToServer(serverSocket)) return 1;
 
-	std::thread receiveThread(&ReceivesManager, std::ref(serverSocket), std::ref(startGame), std::ref(players));
+	std::thread receiveThread(&ReceivesManager, std::ref(playerInfo), std::ref(serverSocket), std::ref(startGame), std::ref(players), std::ref(aMensajes));
 	receiveThread.detach();
 
 	serverSocket.send(loginPacket);
@@ -214,7 +228,6 @@ int main()
 		std::cout << "Would you like to Join a room or Create a new one? (J/C)" << std::endl;
 		std::cin >> answer;
 	} while (!IsCorrectAnswerRoom(answer));
-
 
 	if (answer == 'j' || answer == 'J'){
 		std::string gameId;
@@ -262,7 +275,7 @@ int main()
 		Utils::print("Waiting for other players...");
 	}
 
-	std::thread chatThread(&DrawChat, std::ref(aMensajes));
+	std::thread chatThread(&DrawChat, std::ref(serverSocket), std::ref(playerInfo), std::ref(aMensajes));
 
 	//Mentre no son tots els jugadors a la partida
 	while (!startGame) {
