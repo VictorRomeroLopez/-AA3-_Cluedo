@@ -12,6 +12,7 @@
 #include <LobbyRoom.h>
 #include <Messages.h>
 
+
 const sf::IpAddress SERVER_IP = sf::IpAddress("127.0.0.1");
 const unsigned short SERVER_PORT = 50000;
 const sf::Time SERVER_TIMEOUT = sf::seconds(5);

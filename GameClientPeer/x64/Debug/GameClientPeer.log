@@ -1,0 +1,3 @@
+﻿  MainClientPeer.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+  GameClientPeer.vcxproj -> C:\Users\VictorRomero\Documents\ENTI\3r\Xarxes\[AA3]_Cluedo\x64\Debug\GameClientPeer.exe

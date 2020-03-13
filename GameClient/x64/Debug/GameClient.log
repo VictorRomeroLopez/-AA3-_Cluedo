@@ -1,4 +1,6 @@
-﻿  Graphics.cpp
+﻿  Source.cpp
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(15): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+  c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\playerinfo.h(6): note: see declaration of 'PlayerInfo::Color'
 c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\graphics.h(34): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
           [
@@ -21,4 +23,14 @@ c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\graphics.
           [
               T=float
           ]
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(91): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(194): warning C4101: 'maxPlayers': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(195): warning C4101: 'currentPlayersJoined': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(224): warning C4101: 'statusRequest': unreferenced local variable
+c:\users\victorromero\documents\enti\3r\xarxes\[aa3]_cluedo\gameclient\source.cpp(225): warning C4101: 'numPlayersRequest': unreferenced local variable
   GameClient.vcxproj -> C:\Users\VictorRomero\Documents\ENTI\3r\Xarxes\[AA3]_Cluedo\x64\Debug\GameClient.exe
