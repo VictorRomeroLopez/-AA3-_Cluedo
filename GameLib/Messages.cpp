@@ -24,3 +24,15 @@ Messages::Msg Messages::IsMessage(std::string message)
 	else if (message == "DESMENTIR") return Messages::Msg::DESMENTIR;
 	else return Messages::Msg::NONE;
 }
+
+Messages::Msg Messages::IsChatMessage(std::string message) {
+	if (message == "\\login") return Messages::Msg::LOGIN;
+	else if (message == "\\color") return Messages::Msg::COLOR;
+	else if (message == "\\join") return Messages::Msg::JOIN;
+	else if (message == "\\create") return Messages::Msg::CREATE;
+	else if (message == "\\refresh") return Messages::Msg::REFRESH;
+	else if (message == "\\ready") return Messages::Msg::READY;
+	else if (message == "\\roll") return Messages::Msg::DADO;
+	else if (message == "\\cards") return Messages::Msg::START;
+	else return Messages::Msg::NONE;
+}

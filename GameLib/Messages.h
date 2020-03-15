@@ -30,5 +30,6 @@ public:
 	};
 
 	static Msg IsMessage(std::string);
+	static Msg IsChatMessage(std::string);
 };
 

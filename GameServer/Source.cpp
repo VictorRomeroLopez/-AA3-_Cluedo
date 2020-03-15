@@ -86,18 +86,23 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 
 				sf::Packet answerPacket;
 				bool joinResponseStatus;
+				bool isLobbyFull = false;
 
 				clientPacket >> lobbyRoomId >> lobbyRoomPasswd;
 				answerPacket << "JOIN_RESPONSE";
 
 				if (GetLobbyRoomWithId((unsigned short)std::stoul(lobbyRoomId, nullptr, 0), rooms, lobbyRoomRequested)) {
 					if ((*lobbyRoomRequested)->GetPasswd() == lobbyRoomPasswd) {
+
+						(*lobbyRoomRequested)->SetUniqueColor(clientInfo);
+
 						joinResponseStatus = true;
-						answerPacket << joinResponseStatus;
-						bool isLobbyFull = (*lobbyRoomRequested)->IsLobbyFull();
-						answerPacket << isLobbyFull;
+						isLobbyFull = (*lobbyRoomRequested)->IsLobbyFull();
+
 						unsigned short numPlayersOnRoom = (*lobbyRoomRequested)->GetInfoPlayersOnRoom().size();
-						answerPacket << numPlayersOnRoom;
+
+						answerPacket << joinResponseStatus << clientInfo->GetIdColor() << isLobbyFull << numPlayersOnRoom;
+
 						for (int i = 0; i < (*lobbyRoomRequested)->GetInfoPlayersOnRoom().size(); i++) {
 							std::string name = (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetName();
 							unsigned short color = (*lobbyRoomRequested)->GetInfoPlayersOnRoom()[i]->GetIdColor();
@@ -119,6 +124,7 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				if (joinResponseStatus) {
 					(*lobbyRoomRequested)->SendDataToOtherPlayers(clientInfo);
 					(*lobbyRoomRequested)->AddPlayer(socket, clientInfo);
+					if (isLobbyFull) (*lobbyRoomRequested)->SendCards();
 				}
 
 				break;
@@ -130,8 +136,13 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				clientPacket >> lobbyRoomName >> lobbyRoomPasswd >> lobbyRoomNumPlayers;
 				LobbyRoom* newLobbyRoom = new LobbyRoom(lobbyRoomName, lobbyRoomPasswd, lobbyRoomNumPlayers);
 				lobbyRoomRequested = &newLobbyRoom;
+				(*lobbyRoomRequested)->SetUniqueColor(clientInfo);
 				newLobbyRoom->AddPlayer(socket, clientInfo);
 				rooms->push_back(newLobbyRoom);
+
+				sf::Packet createResponse;
+				createResponse << "CREATE_RESPONSE" << true << clientInfo->GetIdColor();
+				socket->send(createResponse);
 				break;
 			}
 			case Messages::Msg::MSG: {
@@ -142,12 +153,37 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				(*lobbyRoomRequested)->SendMessageToOtherPlayers(_nick, _message);
 				break;
 			}
-			case Messages::Msg::COLOR:
+			case Messages::Msg::COLOR: {
+				std::string playerNick;
+				unsigned short playerColor;
+				sf::Packet answerPacket;
+
+				clientPacket >> playerNick >> playerColor;
+
+				if ((*lobbyRoomRequested)->SetPlayerColor(playerNick, playerColor)) {
+					(*lobbyRoomRequested)->SendColorChangeToOtherPlayers(playerNick, playerColor);
+				}
+				else {
+					answerPacket << "-1";
+					socket->send(answerPacket);
+				}
 				break;
+			}
 			case Messages::Msg::READY:
 				break;
 			case Messages::Msg::REFRESH:
 				break;
+			case Messages::Msg::DADO: {
+				sf::Packet dieThrow;
+
+				if ((*lobbyRoomRequested)->IsPlayerTurn(socket)) {
+					dieThrow << "DADO" << LobbyRoom::RollDie();
+					if (socket->send(dieThrow) == sf::Socket::Done) {
+						Utils::print("Se ha tirado el dado");
+					}
+				}
+				break;
+			}
 		}
 	}
 }

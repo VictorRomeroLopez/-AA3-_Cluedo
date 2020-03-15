@@ -143,6 +143,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Card.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="LobbyRoom.h" />
     <ClInclude Include="Messages.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Card.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="LobbyRoom.cpp" />
     <ClCompile Include="Messages.cpp" />

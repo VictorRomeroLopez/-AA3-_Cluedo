@@ -11,9 +11,10 @@ PlayerInfo::PlayerInfo()
 }
 
 PlayerInfo::PlayerInfo(std::string _name) :
-name(_name), position(sf::Vector2i(0,0)), lives(3), color(Color::BLUE){}
+	name(_name), position(sf::Vector2i(0,0)), lives(3), color(Color::BLUE) {}
 
-PlayerInfo::PlayerInfo(std::string _name, unsigned short _color) : name(_name), position(sf::Vector2i(0, 0)), lives(3), color(IdColorToColor(_color)) {}
+PlayerInfo::PlayerInfo(std::string _name, unsigned short _color) : 
+	name(_name), position(sf::Vector2i(0, 0)), lives(3), color(IdColorToColor(_color)) {}
 
 PlayerInfo::~PlayerInfo()
 {
@@ -33,6 +34,27 @@ PlayerInfo::Color PlayerInfo::GetColor()
 	return color;
 }
 
+unsigned short PlayerInfo::GetDieThrow() {
+	return dieThrow;
+}
+
+void PlayerInfo::SetDieThrow(unsigned short _dieThrow) {
+	dieThrow = _dieThrow;
+}
+
+sf::Vector2i PlayerInfo::GetPosition() {
+	return position;
+}
+
+void PlayerInfo::SetPosition(sf::Vector2i _position) {
+	position = _position;
+}
+
+PlayerInfo::Color PlayerInfo::GetRandomColor()
+{
+	return IdColorToColor(rand() % ColorToIdColor(Color::NONE));
+}
+
 void PlayerInfo::SetColor(PlayerInfo::Color _color) {
 	color = _color;
 }
@@ -40,6 +62,16 @@ void PlayerInfo::SetColor(PlayerInfo::Color _color) {
 unsigned short PlayerInfo::GetIdColor()
 {
 	return static_cast<unsigned short>(color);
+}
+
+std::vector<Card> PlayerInfo::GetCards()
+{
+	return hand;
+}
+
+void PlayerInfo::SetCards(std::vector<Card> _cards)
+{
+	hand = _cards;
 }
 
 PlayerInfo::Color PlayerInfo::IdColorToColor(unsigned short _idColor) {
@@ -53,4 +85,22 @@ PlayerInfo::Color PlayerInfo::IdColorToColor(unsigned short _idColor) {
 	else if (_idColor == 5) _color = Color::ORANGE;
 	
 	return _color;
+}
+
+unsigned short PlayerInfo::ColorToIdColor(Color _color)
+{
+	return static_cast<unsigned short>(_color);
+}
+
+bool PlayerInfo::ColorStringToIdColor(unsigned short& _idColor, std::string colorString) {
+	
+	if (colorString == "red") _idColor = 0;
+	else if (colorString == "green") _idColor = 1;
+	else if (colorString == "blue") _idColor = 2;
+	else if (colorString == "yellow") _idColor = 3;
+	else if (colorString == "purple") _idColor = 4;
+	else if (colorString == "orange") _idColor = 5;
+	else return false;
+	return true;
+
 }

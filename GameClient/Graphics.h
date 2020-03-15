@@ -4,6 +4,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Network.hpp>
 #include <array>
+#include <PlayerInfo.h>
 
 #define SIZE 20.f
 ///TAMAÑO EN PX DE LA VENTANA
@@ -66,7 +67,7 @@ class Graphics
 
 public:
 	Graphics();
-	void DrawDungeon();
+	void DrawDungeon(PlayerInfo& currentPlayer, std::vector<PlayerInfo>& players);
 	~Graphics();
 };
 

@@ -30,7 +30,17 @@ Graphics::Graphics()
 	centroMensajes.longitud.y = 6;
 }
 
-void Graphics::DrawDungeon()
+sf::Color ParsePlayerColor(PlayerInfo::Color _color) {
+	if (_color == PlayerInfo::Color::RED) return sf::Color::Red;
+	else if (_color == PlayerInfo::Color::GREEN) return sf::Color::Green;
+	else if (_color == PlayerInfo::Color::BLUE) return sf::Color::Blue;
+	else if (_color == PlayerInfo::Color::YELLOW) return sf::Color::Yellow;
+	else if (_color == PlayerInfo::Color::PURPLE) return sf::Color(203, 66, 245, 255);
+	else if (_color == PlayerInfo::Color::ORANGE) return sf::Color(247, 157, 30, 255);
+	else return sf::Color::White;
+}
+
+void Graphics::DrawDungeon(PlayerInfo& currentPlayer, std::vector<PlayerInfo>& players)
 {
 	sf::RenderWindow _window(sf::VideoMode(800, 600), "Cluedo");
 	sf::RectangleShape shape(sf::Vector2f(SIZE, SIZE));
@@ -70,16 +80,28 @@ void Graphics::DrawDungeon()
 					std::cout << "DOWN\n";
 				}
 				break;
+			case sf::Event::MouseButtonPressed:
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+					std::cout << (sf::Mouse::getPosition().x - _window.getPosition().x - 8) << ' ' << (sf::Mouse::getPosition().y - _window.getPosition().y - 31) << std::endl;
+					currentPlayer.SetPosition(
+						sf::Vector2i(
+							(sf::Mouse::getPosition().x - _window.getPosition().x - 8) / SIZE, 
+							(sf::Mouse::getPosition().y - _window.getPosition().y - 31) / SIZE
+						)
+					);
+				}
+				break;
 			}
 		}
+
 		_window.clear();
+
 		for (int i = 0; i < W_WINDOW_TITLE; i++)
 		{
 			for (int j = 0; j < H_WINDOW_TITLE; j++)
 			{
 
 				shape.setFillColor(sf::Color(90, 90, 90, 255));
-
 
 				shape.setPosition(sf::Vector2f(i*SIZE, j*SIZE));
 				_window.draw(shape);
@@ -93,22 +115,24 @@ void Graphics::DrawDungeon()
 		}
 		centroMensajes.Draw(_window);
 
-		/*sf::Vector2f position;
-		position.x = 0; position.y = 0;
-		shape.setFillColor(sf::Color::Blue);
-		shape.setFillColor(sf::Color(0, 0, 255, 255));
-		shape.setPosition(sf::Vector2f(position.x*SIZE, position.y*SIZE));
+		sf::Vector2i position;
+		
+		position = currentPlayer.GetPosition();
+		shape.setFillColor(ParsePlayerColor(currentPlayer.GetColor()));
+		shape.setPosition(sf::Vector2f(position.x * SIZE, position.y * SIZE));
 		_window.draw(shape);
 
-		position.x = W_WINDOW_TITLE - 1; position.y = H_WINDOW_TITLE - 1;
-		shape.setFillColor(sf::Color::Green);
-		shape.setFillColor(sf::Color(255, 255, 0, 255));
-		shape.setPosition(sf::Vector2f(position.x*SIZE, position.y*SIZE));
-		_window.draw(shape);*/
+		for (PlayerInfo pI : players) {
+			position = pI.GetPosition();
+			shape.setFillColor(ParsePlayerColor(pI.GetColor())); 
+			shape.setPosition(sf::Vector2f(position.x * SIZE, position.y * SIZE));
+			_window.draw(shape);
+		}
 
 		_window.display();
 	}
 }
+
 
 Graphics::~Graphics()
 {
