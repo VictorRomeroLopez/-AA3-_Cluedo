@@ -1,1 +1,6 @@
-﻿  GameServer.vcxproj -> C:\Users\andre\OneDrive\Escritorio\Treballs\3er Curs\Xarxes\-AA3-_Cluedo\x64\Debug\GameServer.exe
+﻿  Source.cpp
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(20): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+  c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(8): note: see declaration of 'PlayerInfo::Color'
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gameserver\source.cpp(102): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data
+  GameServer.vcxproj -> C:\Users\andre\OneDrive\Escritorio\Treballs\3er Curs\Xarxes\-AA3-_Cluedo\x64\Debug\GameServer.exe

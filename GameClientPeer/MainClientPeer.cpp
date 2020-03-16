@@ -50,20 +50,21 @@ void PeerListener(Player* player, LobbyRoom& lobbyRoom) {
 	}
 }
 
-void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool& startGame, std::vector<PlayerInfo>& players, std::vector<std::string>& aMensajes) {
-	bool connectedToServer = true;
-
-	while (connectedToServer) {
+void ReceivesManager(PlayerInfo& _playerInfo, std::vector<Player>& players, int peerID, LobbyRoom& lobbyRoom, unsigned int random) {
+	bool connectedToPeer = true;
+	srand(random);
+	while (connectedToPeer) {
 		sf::Packet receivePacket;
-		sf::Socket::Status serverStatus;
+		sf::Socket::Status peerStatus;
 
-		serverStatus = serverSocket.receive(receivePacket);
 
-		if (serverStatus == sf::Socket::Status::Disconnected) {
+		peerStatus = players[peerID].tcpSocket->receive(receivePacket);
+
+		if (peerStatus == sf::Socket::Status::Disconnected) {
 			Utils::print("Server has been disconected!");
-			connectedToServer = false;
+			connectedToPeer = false;
 		}
-		else if (serverStatus != sf::Socket::Status::Done) {
+		else if (peerStatus != sf::Socket::Status::Done) {
 			Utils::print("Something went wrong trying to receive a packet from server");
 			continue;
 		}
@@ -73,63 +74,7 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 		receivePacket >> headder;
 
 		switch (Messages::IsMessage(headder)) {
-		case Messages::Msg::CREATE_RESPONSE: {
-			bool createResponse;
-			receivePacket >> createResponse;
-
-			if (createResponse)
-			{
-				unsigned short settedColor;
-				receivePacket >> settedColor;
-				Utils::print("Esta arribant al client el color: " + std::to_string(settedColor));
-				_playerInfo.SetColor(PlayerInfo::IdColorToColor(settedColor));
-				Utils::print("Lobby Created correctly");
-			}
-			else
-			{
-				Utils::print("Something went wrong trying to create a lobby");
-			}
-
-			break;
-		}
-		case Messages::Msg::JOIN_RESPONSE: {
-
-			bool statusRequest;
-			unsigned short numPlayersRequest;
-
-			receivePacket >> statusRequest;
-
-			if (statusRequest) {
-				unsigned short settedColor;
-
-				receivePacket >> settedColor;
-				receivePacket >> startGame;
-
-				Utils::print("Esta arribant al client el color: " + std::to_string(settedColor));
-				_playerInfo.SetColor(PlayerInfo::IdColorToColor(settedColor));
-				receivePacket >> numPlayersRequest;
-
-				for (int i = 0; i < numPlayersRequest; i++) {
-
-					std::string playerName;
-					unsigned short playerColor;
-					receivePacket >> playerName >> playerColor;
-					players.push_back(PlayerInfo(playerName, playerColor));
-					std::cout << playerName << ' ' << playerColor << std::endl;
-				}
-			}
-			break;
-		}
-		case Messages::Msg::P_JOINED: {
-			std::string newPlayerName;
-			unsigned short newPlayerColor;
-
-			receivePacket >> startGame >> newPlayerName >> newPlayerColor;
-			players.push_back(PlayerInfo(newPlayerName, newPlayerColor));
-			Utils::print(newPlayerName + " has joined the room!");
-		}
 		case Messages::Msg::MSG: {
-
 			std::string nickName;
 			std::string message;
 
@@ -141,49 +86,157 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 
 			break;
 		}
-		case Messages::Msg::COLOR_RESPONSE: {
-			std::string newPlayerNick;
-			unsigned short newPlayerColor;
-			receivePacket >> newPlayerNick >> newPlayerColor;
+		case Messages::Msg::DADO: {
+			players[peerID].info.SetDieThrow(lobbyRoom.RollDie());
+			std::cout << "Dado de " << players[peerID].info.GetName() << " : " << players[peerID].info.GetDieThrow() << std::endl;
+			break;
+			}
 
-			if (newPlayerNick == "-1") break;
+		case Messages::Msg::PISTA: {
+			std::string name;
+			int idPlayer;
+			receivePacket >> name;
 
-			for (int i = 0; i < players.size(); i++) {
-				if (players[i].GetName() == newPlayerNick) {
-					players[i].SetColor(PlayerInfo::IdColorToColor(newPlayerColor));
-					break;
+			Card::CardName cardName = _playerInfo.StringToCardName(name);
+			lobbyRoom.EraseClueCard(cardName);
+
+			receivePacket >> idPlayer;
+
+			if(idPlayer != -1)
+				std::cout << "La carta " << name << " la tiene: " << players[idPlayer].info.GetName() << std::endl;
+			else
+				std::cout << "La carta que ha descubierto "<<players[idPlayer].info.GetName() << " es: " << name << ". Esta dentro del sobre! " << std::endl;
+
+			break;
+			}
+		}
+		lobbyRoom.NextTurn();
+	}
+}
+
+std::vector<std::string*> GetParameters(std::string str)
+{
+	std::vector<std::string*> parameters;
+	std::string word = "";
+
+	for (auto x : str)
+	{
+		if (x == ' ')
+		{
+			parameters.push_back(new std::string(word));
+			word = "";
+		}
+		else
+		{
+			word = word + x;
+		}
+	}
+
+	parameters.push_back(new std::string(word));
+	return parameters;
+}
+
+void GetChatCommand(std::vector<Player>& players, PlayerInfo& playerInfo, std::string _message, short myPlayerOrder, LobbyRoom& lobbyRoom, unsigned int random) {
+	sf::Packet packetCommand;
+	std::vector<std::string*> parameters = GetParameters(_message);
+	srand(random);
+	switch (Messages::IsChatMessage(*parameters[0])) {
+			
+		case Messages::Msg::DADO: {
+			packetCommand << "DADO";
+			for (int i = 0; i < players.size(); i++)
+			{
+				if (i != myPlayerOrder)
+				{
+					if (players[i].tcpSocket->send(packetCommand) == sf::Socket::Done) {
+						Utils::print("se ha enviado el dado");
+						
+					}
 				}
 			}
+			players[myPlayerOrder].info.SetDieThrow(1);
+			std::cout << "Te ha tocado un " << players[myPlayerOrder].info.GetDieThrow() << std::endl;
 
-			if (_playerInfo.GetName() == newPlayerNick) {
-				Utils::print("Esta cambiant color");
-				_playerInfo.SetColor(PlayerInfo::IdColorToColor(newPlayerColor));
+			if (players[myPlayerOrder].info.GetDieThrow() == 1)
+			{
+				short type = rand() % 3;
+				if (type == 0)
+				{
+					std::cout << "Pista! Escoge una carta del tipo ARMA con el comando \\clue y la carta deseada: " << std::endl;
+					playerInfo.SetClueCardType(Card::CardType::TOOL);
+				}
+				else if (type == 1)
+				{
+					std::cout << "Pista! Escoge una carta del tipo PERSONAJE con el comando \\clue y la carta deseada: " << std::endl;
+					playerInfo.SetClueCardType(Card::CardType::CHARACTER);
+				}
+				else if (type == 2)
+				{
+					std::cout << "Pista! Escoge una carta del tipo LUGAR con el comando \\clue y la carta deseada: " << std::endl;
+					playerInfo.SetClueCardType(Card::CardType::ROOM);
+				}
 			}
+			else
+				lobbyRoom.NextTurn();
 
 			break;
-		}
-		case Messages::Msg::DADO: {
-			unsigned short dieThrow;
-			receivePacket >> dieThrow;
-			Utils::print(std::to_string(dieThrow));
-			_playerInfo.SetDieThrow(dieThrow);
-			break;
-		}
-		case Messages::Msg::START: {
-			unsigned short cardType;
-			unsigned short cardName;
-			unsigned short numCards;
-			receivePacket >> numCards;
-			std::vector<Card>* cardsHand = new std::vector<Card>();
+		}	
+		case Messages::Msg::PISTA: {
+			Card::CardName name = playerInfo.StringToCardName(*parameters[1]);
+			std::vector<Card> cards = lobbyRoom.GetClueCards();
+			std::vector<Card> playerCards;
+			int idPlayer;
+			for (int i = 0; i < cards.size(); i++)
+			{
+				if (cards[i].GetName() == name)
+				{
+					if (cards[i].GetType() == playerInfo.GetClueCardType())
+					{
+						bool found = false;
+						for (int j = 0; j < players.size(); j++)
+						{
+							playerCards = players[j].info.GetCards();
+							for (int k = 0; k < playerCards.size(); k++)
+							{
+								if (playerCards[k].GetName() == name) {
+									std::cout << "La carta " << *parameters[1] << "la tiene: " << players[j].info.GetName() << std::endl;
+									found = true;
+									idPlayer = j; 
+									lobbyRoom.EraseClueCard(name);
+									break;
+								}
+							}
+						}
+						if (!found)
+						{
+							std::cout << "La carta " << *parameters[1] << "esta dentro del sobre! " << std::endl;
+							lobbyRoom.EraseClueCard(name);
+							idPlayer = -1;
+						}
 
-			for (int i = 0; i < numCards; i++) {
-				receivePacket >> cardType >> cardName;
-				cardsHand->push_back(Card(cardType, cardName));
+
+						packetCommand << "PISTA";
+						packetCommand << *parameters[1];
+						packetCommand << idPlayer;
+
+						lobbyRoom.NextTurn();
+
+						for (int j = 0; j < players.size(); j++)
+						{
+							if (j != myPlayerOrder)
+							{
+								if (players[j].tcpSocket->send(packetCommand) == sf::Socket::Done) {
+									Utils::print("se ha enviado la pista");
+
+								}
+							}
+						}
+
+					}
+					else
+						std::cout << "Esta carta no forma parte del tipo que te he pedido!" << std::endl;
+				}
 			}
-
-			_playerInfo.SetCards(*cardsHand);
-			break;
-		}
 		}
 	}
 }
@@ -293,7 +346,7 @@ int main()
 		std::cout << "Can't load the font file" << std::endl;
 	}
 
-	mensaje = ">";
+	mensaje = "";
 
 	sf::Text chattingText(mensaje, font, 14);
 	chattingText.setFillColor(sf::Color(0, 160, 0));
@@ -314,7 +367,7 @@ int main()
 		if (peers[i].tcpSocket != mySocket)
 		{
 			Utils::print("Thread");
-			std::thread thread(&PeerListener, &peers[i], std::ref(lobbyRoom));
+			std::thread thread(&ReceivesManager, std::ref(playerInfo), std::ref(peers), i, std::ref(lobbyRoom), random);
 			thread.detach();
 			Utils::print("detach");
 		}
@@ -357,9 +410,7 @@ int main()
 	for (int i = 0; i < cards.size(); i++) {
 		Utils::print(cards[i].print());
 	}
-
-	Utils::print("Is my turn? " + lobbyRoom.IsPlayerTurn(peers[myPlayerOrder].tcpSocket));
-
+	
 	while (window.isOpen())
 	{
 		sf::Event evento;
@@ -378,22 +429,20 @@ int main()
 				{
 					sf::Packet packet;
 					std::string packetToSend = mensaje;
-					packet << packetToSend;
-					for (int i = 0; i < peers.size(); i++) {
-						if (peers[i].tcpSocket != mySocket)
-							peers[i].tcpSocket->send(packet);
+					if (mensaje[0] == '\\') {
+						Utils::print("COMMAND");
+						GetChatCommand(peers, playerInfo, mensaje, myPlayerOrder, lobbyRoom, random);
 					}
-
-					aMensajes.push_back(mensaje);
-
-					if (aMensajes.size() > 25)
-					{
-						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
-					}
-
-					mensaje = ">";
-
-					lobbyRoom.NextTurn();
+					else {
+						Utils::print("MEssage");
+						packet << "MSG" << playerInfo.GetName() << packetToSend;
+						for (int i = 0; i < peers.size(); i++) {
+							if (peers[i].tcpSocket != mySocket)
+								peers[i].tcpSocket->send(packet);
+						}
+						
+					}					
+					mensaje = "";
 				}
 				break;
 
@@ -415,6 +464,7 @@ int main()
 			chattingText.setString(chatting);
 			window.draw(chattingText);
 		}
+
 
 		std::string mensaje_ = mensaje + "_";
 		text.setString(mensaje_);

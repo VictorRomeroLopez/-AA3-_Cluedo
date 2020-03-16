@@ -31,6 +31,8 @@ LobbyRoom::LobbyRoom(std::string _roomName, std::string _password, unsigned shor
 	stackOfCards.push_back( Card (Card::CardType::ROOM, Card::CardName::SALON));
 	stackOfCards.push_back( Card (Card::CardType::ROOM, Card::CardName::VESTIBULO));
 
+	clueCards = stackOfCards;
+
 	SetupEnvelope();
 }
 
@@ -211,6 +213,20 @@ void LobbyRoom::SendCards()
 		if (playersSocket[i]->send(packetWithCards) != sf::Socket::Done) {
 			Utils::print("Error al enviar las cartas al usuario!");
 		}
+	}
+}
+
+std::vector<Card> LobbyRoom::GetClueCards()
+{
+	return clueCards;
+}
+
+void LobbyRoom::EraseClueCard(Card::CardName card)
+{
+	for (int i = 0; i < clueCards.size(); i++)
+	{
+		if (clueCards[i].GetName() == card)
+			clueCards.erase(clueCards.begin()+ i);
 	}
 }
 

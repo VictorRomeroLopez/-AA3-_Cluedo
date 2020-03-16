@@ -22,6 +22,7 @@ public:
 		START,
 		RESOLVE,
 		DADO,
+		PISTA,
 		CASILLA,
 		MOVE,
 		DEDUCCION,

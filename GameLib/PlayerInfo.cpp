@@ -104,3 +104,40 @@ bool PlayerInfo::ColorStringToIdColor(unsigned short& _idColor, std::string colo
 	return true;
 
 }
+
+Card::CardType PlayerInfo::GetClueCardType()
+{
+	return clueCardType;
+}
+
+void PlayerInfo::SetClueCardType(Card::CardType clueCard)
+{
+	clueCardType = clueCard;
+}
+
+Card::CardName PlayerInfo::StringToCardName(std::string cardName)
+{
+	if (cardName == "WRENCH") return Card::CardName::WRENCH;
+	else if (cardName == "CANDLESTICK") return Card::CardName::CANDLESTICK;
+	else if (cardName == "LEADPIPE") return Card::CardName::LEADPIPE;
+	else if (cardName == "ROPE") return Card::CardName::ROPE;
+	else if (cardName == "REVOLVER") return Card::CardName::REVOLVER;
+	else if (cardName == "KNIFE") return Card::CardName::KNIFE;
+	else if (cardName == "CELESTE") return Card::CardName::CELESTE;
+	else if (cardName == "AMAPOLA") return Card::CardName::AMAPOLA;
+	else if (cardName == "RUBIO") return Card::CardName::RUBIO;
+	else if (cardName == "BLANCO") return Card::CardName::BLANCO;
+	else if (cardName == "MORA") return Card::CardName::MORA;
+	else if (cardName == "PRADO") return Card::CardName::PRADO;
+	else if (cardName == "INVERNADERO") return Card::CardName::INVERNADERO;
+	else if (cardName == "SALABILLAR") return Card::CardName::SALABILLAR;
+	else if (cardName == "BIBLIOTECA") return Card::CardName::BIBLIOTECA;
+	else if (cardName == "ESTUDIO") return Card::CardName::ESTUDIO;
+	else if (cardName == "SALABAILE") return Card::CardName::SALABAILE;
+	else if (cardName == "VESTIBULO") return Card::CardName::VESTIBULO;
+	else if (cardName == "COCINA") return Card::CardName::COCINA;
+	else if (cardName == "COMEDOR") return Card::CardName::COMEDOR;
+	else if (cardName == "SALON") return Card::CardName::SALON;
+	else
+		return (Card::CardName)21;
+}

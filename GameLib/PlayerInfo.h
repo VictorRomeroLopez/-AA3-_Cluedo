@@ -13,6 +13,7 @@ class PlayerInfo
 	int lives;
 	unsigned short dieThrow;
 	std::vector<Card> hand;
+	Card::CardType clueCardType;
 
 public:
 
@@ -46,5 +47,7 @@ public:
 	static Color IdColorToColor(unsigned short);
 	static unsigned short ColorToIdColor(Color);
 	static bool ColorStringToIdColor(unsigned short& _idColor, std::string colorString);
-
+	Card::CardType GetClueCardType();
+	void SetClueCardType(Card::CardType clueCard);
+	static Card::CardName StringToCardName(std::string cardName);
 };

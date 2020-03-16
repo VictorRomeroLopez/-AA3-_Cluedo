@@ -18,6 +18,7 @@ Messages::Msg Messages::IsMessage(std::string message)
 	else if (message == "START") return Messages::Msg::START;
 	else if (message == "RESOLVE") return Messages::Msg::RESOLVE;
 	else if (message == "DADO") return Messages::Msg::DADO;
+	else if (message == "PISTA") return Messages::Msg::PISTA;
 	else if (message == "CASILLA") return Messages::Msg::CASILLA;
 	else if (message == "MOVE") return Messages::Msg::MOVE;
 	else if (message == "DEDUCCION") return Messages::Msg::DEDUCCION;
@@ -33,6 +34,7 @@ Messages::Msg Messages::IsChatMessage(std::string message) {
 	else if (message == "\\refresh") return Messages::Msg::REFRESH;
 	else if (message == "\\ready") return Messages::Msg::READY;
 	else if (message == "\\roll") return Messages::Msg::DADO;
+	else if (message == "\\clue") return Messages::Msg::PISTA;
 	else if (message == "\\cards") return Messages::Msg::START;
 	else return Messages::Msg::NONE;
 }

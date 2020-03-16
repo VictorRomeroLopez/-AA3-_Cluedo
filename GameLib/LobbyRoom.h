@@ -15,12 +15,14 @@ class LobbyRoom
 	std::vector<sf::TcpSocket*> playersSocket;
 	std::vector<PlayerInfo*> playerInfo;
 	std::vector<Card> stackOfCards;
+	std::vector<Card> clueCards;
 	std::vector<Card> envelopCards;
 	std::string roomName;
 	std::string password;
 	unsigned short numPlayers;
 	unsigned short idLobbyRoom;
 	unsigned short turn;
+	
 
 public:
 	LobbyRoom();
@@ -47,6 +49,8 @@ public:
 	Card DrawCard(Card::CardType);
 	void SetupEnvelope();
 	void SendCards();
+	std::vector<Card> GetClueCards();
+	void EraseClueCard(Card::CardName card);
 	std::map<short, std::vector<Card>> SetPeersCards();
 };
 

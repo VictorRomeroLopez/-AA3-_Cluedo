@@ -1,5 +1,5 @@
 ﻿  MainClientPeer.cpp
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(19): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(20): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
   c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(8): note: see declaration of 'PlayerInfo::Color'
 c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gameclientpeer\graphics.h(35): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
@@ -24,7 +24,7 @@ c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamecli
               T=float
           ]
 c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gameclientpeer\mainclientpeer.cpp(414): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gameclientpeer\mainclientpeer.cpp(467): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
           with
           [
               T=float

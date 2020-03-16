@@ -1,14 +1,26 @@
-﻿  LobbyRoom.cpp
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(19): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+﻿  Card.cpp
+  Console.cpp
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(20): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+  c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(8): note: see declaration of 'PlayerInfo::Color'
+  LobbyRoom.cpp
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(20): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
   c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(8): note: see declaration of 'PlayerInfo::Color'
 c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
 c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(7): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(156): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(167): warning C4267: '=': conversion from 'size_t' to 'unsigned short', possible loss of data
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(226): warning C4267: '=': conversion from 'size_t' to '_Ty', possible loss of data
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(158): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned short', possible loss of data
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(169): warning C4267: '=': conversion from 'size_t' to 'unsigned short', possible loss of data
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(242): warning C4267: '=': conversion from 'size_t' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(227): warning C4267: '-=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\lobbyroom.cpp(243): warning C4267: '-=': conversion from 'size_t' to 'int', possible loss of data
+  Messages.cpp
+  PlayerInfo.cpp
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(20): warning C4240: nonstandard extension used: access to 'PlayerInfo::Color' now defined to be 'public', previously it was defined to be 'private'
+  c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\playerinfo.h(8): note: see declaration of 'PlayerInfo::Color'
+  Utils.cpp
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
+  Generating Code...
   GameLib.vcxproj -> C:\Users\andre\OneDrive\Escritorio\Treballs\3er Curs\Xarxes\-AA3-_Cluedo\x64\Debug\GameLib.lib
