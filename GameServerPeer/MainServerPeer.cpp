@@ -1,19 +1,18 @@
 #include <SFML/Network.hpp>
 #include <SFML/System.hpp>
 #include <iostream>
-#include <atltypes.h>
 
 using namespace sf;
 
-const u_short MAX_PLAYERS = 5;
-const u_short SERVER_PORT = 50000;
+const unsigned short MAX_PLAYERS = 5;
+const unsigned short SERVER_PORT = 50000;
 
 struct Address {
 	std::string nick;
 	IpAddress ipAdress;
-	u_short port;
+	unsigned short port;
 
-	Address(std::string _nick, IpAddress _ipAddress, u_short _port) : nick(_nick), ipAdress(_ipAddress), port(_port) {}
+	Address(std::string _nick, IpAddress _ipAddress, unsigned short _port) : nick(_nick), ipAdress(_ipAddress), port(_port) {}
 
 };
 

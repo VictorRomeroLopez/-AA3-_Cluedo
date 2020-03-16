@@ -31,6 +31,7 @@ public:
 
 	std::string GetRoomName();
 	unsigned short GetNumPlayers();
+	unsigned short GetCurrentNumberPlayers();
 	unsigned short GetIdLobbyRoom();
 	std::string GetPasswd();
 	std::vector<PlayerInfo*> GetInfoPlayersOnRoom();
@@ -45,6 +46,8 @@ public:
 	void NextTurn();
 	static unsigned short RollDie();
 	bool IsPlayerTurn(sf::TcpSocket*);
+	PlayerInfo PlayerTurn(sf::TcpSocket*);
+	void SendDie(sf::Packet);
 	Card DrawCard();
 	Card DrawCard(Card::CardType);
 	void SetupEnvelope();
@@ -52,5 +55,6 @@ public:
 	std::vector<Card> GetClueCards();
 	void EraseClueCard(Card::CardName card);
 	std::map<short, std::vector<Card>> SetPeersCards();
+	bool Acusation(unsigned short, unsigned short, unsigned short);
 };
 

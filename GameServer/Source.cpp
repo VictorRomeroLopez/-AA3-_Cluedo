@@ -58,6 +58,32 @@ bool GetLobbyRoomWithId(unsigned short roomId, std::vector<LobbyRoom*>* rooms, L
 	return false;
 }
 
+void SendRooms(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
+	sf::Packet roomsPacket;
+	unsigned short roomsSize = rooms->size();
+	roomsPacket << "GAMES" << roomsSize;
+
+	if (roomsSize > 0) {
+		std::string roomName;
+		unsigned short roomId;
+		unsigned short currentPlayers;
+		unsigned short maxPlayers;
+
+		for (int i = 0; i < roomsSize; i++) {
+			roomName = rooms->at(i)->GetRoomName();
+			roomId = rooms->at(i)->GetIdLobbyRoom();
+			currentPlayers = rooms->at(i)->GetCurrentNumberPlayers();
+			maxPlayers = rooms->at(i)->GetNumPlayers();
+
+			roomsPacket << roomName << roomId << currentPlayers << maxPlayers;
+		}
+	}
+
+	if (socket->send(roomsPacket) != sf::Socket::Status::Done) {
+		Utils::print("Error trying to send GAMES packet");
+	}
+}
+
 void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 	PlayerInfo* clientInfo = new PlayerInfo();
 	sf::Socket::Status clientStatus;
@@ -78,6 +104,11 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				std::string clientName;
 				clientPacket >> clientName;
 				clientInfo = new PlayerInfo(clientName);
+				SendRooms(socket, rooms);
+				break;
+			}
+			case Messages::Msg::REFRESH: {
+				SendRooms(socket, rooms);
 				break;
 			}
 			case Messages::Msg::JOIN: {
@@ -85,7 +116,7 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				std::string lobbyRoomPasswd;
 
 				sf::Packet answerPacket;
-				bool joinResponseStatus;
+				bool joinResponseStatus = false;
 				bool isLobbyFull = false;
 
 				clientPacket >> lobbyRoomId >> lobbyRoomPasswd;
@@ -169,20 +200,33 @@ void ClientLoop(sf::TcpSocket* socket, std::vector<LobbyRoom*>* rooms) {
 				}
 				break;
 			}
-			case Messages::Msg::READY:
-				break;
-			case Messages::Msg::REFRESH:
-				break;
 			case Messages::Msg::DADO: {
 				sf::Packet dieThrow;
 
 				if ((*lobbyRoomRequested)->IsPlayerTurn(socket)) {
-					dieThrow << "DADO" << LobbyRoom::RollDie();
-					if (socket->send(dieThrow) == sf::Socket::Done) {
-						Utils::print("Se ha tirado el dado");
-					}
+					dieThrow << "DADO" << (*lobbyRoomRequested)->PlayerTurn(socket).GetName() << LobbyRoom::RollDie();
+					(*lobbyRoomRequested)->SendDie(dieThrow);
 				}
 				break;
+			}
+			//De la misma forma que en el cliente esto es la acusacion pero quedan 25 minutos para la entrega
+			case Messages::Msg::DEDUCCION:{
+				unsigned short weaponId;
+				unsigned short characterId;
+				unsigned short placeId;
+				bool won;
+
+				clientPacket >> weaponId >> characterId >> placeId;
+
+				won = (*lobbyRoomRequested)->Acusation(weaponId, characterId, placeId);
+
+				sf::Packet resolvePacket;
+
+				resolvePacket << won << (*lobbyRoomRequested)->PlayerTurn(socket).GetName();
+
+				if (won)  resolvePacket << weaponId << characterId << placeId;
+				
+				(*lobbyRoomRequested)->SendDie(resolvePacket);
 			}
 		}
 	}

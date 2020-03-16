@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <thread>
-#include <atltypes.h>
 #include "Graphics.h"
 #include <PlayerInfo.h>
 #include <Utils.h>
@@ -15,9 +14,9 @@
 using namespace sf;
 
 const std::string SERVER_IP = "127.0.0.1";
-const u_short SERVER_PORT = 50000;
-const u_short SERVER_WAIT_TIME = 5;
-const u_short MAX_PLAYERS = 3;
+const unsigned short SERVER_PORT = 50000;
+const unsigned short SERVER_WAIT_TIME = 5;
+const unsigned short MAX_PLAYERS = 3;
 
 std::vector<std::string> aMensajes;
 
@@ -252,7 +251,7 @@ int main()
 	int playersCount;
 	unsigned int random;
 	std::vector<Player> peers;
-	u_short portServer;
+	unsigned short portServer;
 	Packet pack;
 	Socket::Status serverStatus;
 	sf::String mensaje;

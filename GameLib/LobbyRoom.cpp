@@ -48,6 +48,11 @@ unsigned short LobbyRoom::GetNumPlayers()
 	return numPlayers;
 }
 
+unsigned short LobbyRoom::GetCurrentNumberPlayers()
+{
+	return playersSocket.size();
+}
+
 unsigned short LobbyRoom::GetIdLobbyRoom()
 {
 	return idLobbyRoom;
@@ -152,6 +157,23 @@ bool LobbyRoom::IsPlayerTurn(sf::TcpSocket* socket) {
 	}
 
 	return false;
+}
+
+PlayerInfo LobbyRoom::PlayerTurn(sf::TcpSocket* socket)
+{
+	if (playersSocket[turn]->getRemoteAddress() == socket->getRemoteAddress() &&
+		playersSocket[turn]->getRemotePort() == socket->getRemotePort()) {
+		return *playerInfo[turn];
+	}
+
+	return PlayerInfo();
+}
+
+void LobbyRoom::SendDie(sf::Packet packet)
+{
+	for (int i = 0; i < playersSocket.size(); i++) {
+		playersSocket[i]->send(packet);
+	}
 }
 
 Card LobbyRoom::DrawCard() {
@@ -259,4 +281,17 @@ std::map<short, std::vector<Card>> LobbyRoom::SetPeersCards()
 	}
 	std::cout << playersSocket.size()+1 << ", " << numOfCardsPerStack.size() << ", " << cards[0].size() <<", "<<cards[1].size() << std::endl;
 	return cards;
+}
+
+bool LobbyRoom::Acusation(unsigned short weaponId, unsigned short characterId, unsigned short placeId)
+{
+	for (int i = 0; i < envelopCards.size(); i++) {
+		if (envelopCards[i].GetType() == Card::CardType::TOOL && static_cast<unsigned short>(envelopCards[i].GetName()) != weaponId)
+			return false;
+		if (envelopCards[i].GetType() == Card::CardType::CHARACTER && static_cast<unsigned short>(envelopCards[i].GetName()) != characterId)
+			return false;
+		if (envelopCards[i].GetType() == Card::CardType::ROOM && static_cast<unsigned short>(envelopCards[i].GetName()) != placeId)
+			return false;
+	}
+	return true;
 }

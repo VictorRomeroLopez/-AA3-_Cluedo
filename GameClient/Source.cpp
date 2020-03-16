@@ -15,6 +15,12 @@ const sf::IpAddress SERVER_IP = sf::IpAddress("127.0.0.1");
 const unsigned short SERVER_PORT = 50000;
 const sf::Time SERVER_TIMEOUT = sf::seconds(5);
 
+void AddMessageToChat(std::vector<std::string>& aMensajes, std::string message) {
+	aMensajes.push_back(message);
+	if (aMensajes.size() > 25)
+		aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
+}
+
 std::vector<std::string*> GetParameters(std::string str)
 {
 	std::vector<std::string*> parameters;
@@ -37,13 +43,20 @@ std::vector<std::string*> GetParameters(std::string str)
 	return parameters;
 }
 
-void GetChatCommand(sf::TcpSocket& serverSocket, PlayerInfo& playerInfo, std::string _message) {
+void GetChatCommand(sf::TcpSocket& serverSocket, PlayerInfo& playerInfo, std::string _message, std::vector<std::string>& aMensajes) {
 	sf::Packet packetCommand;
 	std::vector<std::string*> parameters = GetParameters(_message);
 
 	switch (Messages::IsChatMessage(*parameters[0])) {
 	case Messages::Msg::REFRESH: {
-		Utils::print("REFRESH");
+
+		sf::Packet refreshPacket;
+		refreshPacket << "REFRESH";
+
+		if (serverSocket.send(refreshPacket) != sf::Socket::Status::Done) {
+			AddMessageToChat(aMensajes, "Error al enviar el paquete REFRESH");
+		}
+
 		break;
 	}
 	case Messages::Msg::COLOR: {
@@ -66,11 +79,69 @@ void GetChatCommand(sf::TcpSocket& serverSocket, PlayerInfo& playerInfo, std::st
 		break;
 	}
 	case Messages::Msg::JOIN: {
-		Utils::print("JOIN");
+		if (parameters.size() == 2)
+		{
+			if (*parameters[1] == "help") {
+				AddMessageToChat(aMensajes, "\\join [roomId] [roomPwd]");
+			}
+			else {
+				AddMessageToChat(aMensajes, "Wrong usage of the command "+ *parameters[0] + "! Check out " + *parameters[0] + " help");
+				break;
+			}
+		}
+		else if (parameters.size() == 3) {
+			std::string gameId = *parameters[1];
+			std::string password = *parameters[2];
+			sf::Packet joinPacket;
+
+			joinPacket << "JOIN" << gameId << password;
+
+			if (serverSocket.send(joinPacket) != sf::Socket::Status::Done) {
+				AddMessageToChat(aMensajes, "Failed to send the join request to the server");
+			}
+		}
 		break;
 	}
 	case Messages::Msg::CREATE: {
-		Utils::print("CREATE");
+		if (parameters.size() == 2)
+		{
+			if (*parameters[1] == "help") {
+				AddMessageToChat(aMensajes, "\\create [roomName] [roomPwd] [numPlayers(3-6)]");
+			}
+			else {
+				AddMessageToChat(aMensajes, "Wrong usage of the command " + *parameters[0] + "! Check out " + *parameters[0] + " help");
+				break;
+			}
+		}
+		else if (parameters.size() == 4) {
+			sf::Packet createLobbyRoomPacket;
+			std::string roomName = *parameters[1];
+			std::string roomPwd = *parameters[2];
+			unsigned short numPlayers;
+
+			if (std::numeric_limits<unsigned short>::max() > std::stoi(*parameters[3])) {
+				numPlayers = (unsigned short)std::stoi(*parameters[3]);
+				if (numPlayers < 3 || numPlayers > 6) {
+					AddMessageToChat(aMensajes, "Number of players must stay between 3 and 6! Check out \\create help");
+					break;
+				}
+			}
+			else {
+				AddMessageToChat(aMensajes, "Wrong usage of the command " + *parameters[0] + "! Check out " + *parameters[0] + " help");
+				break;
+			}
+
+			createLobbyRoomPacket << "CREATE" << roomName << roomPwd << numPlayers;
+
+			if (serverSocket.send(createLobbyRoomPacket) != sf::Socket::Status::Done) {
+				AddMessageToChat(aMensajes, "Failed to send the create request to the server");
+			}
+		}
+		else {
+			AddMessageToChat(aMensajes, "Wrong usage of the command " + *parameters[0] + "! Check out " + *parameters[0] + " help");
+			break;
+		}
+
 		break;
 	}
 	case Messages::Msg::READY: {
@@ -78,7 +149,26 @@ void GetChatCommand(sf::TcpSocket& serverSocket, PlayerInfo& playerInfo, std::st
 		break;
 	}
 	case Messages::Msg::LOGIN: {
-		Utils::print("LOGIN");
+		if (parameters.size() < 2 || parameters[1]->empty()) {
+			AddMessageToChat(aMensajes, "Incorrect parameters for command \\login!");
+		}
+		else
+		{
+			sf::Packet loginPacket;
+			loginPacket << "LOGIN" << *parameters[1];
+
+			if (serverSocket.send(loginPacket) != sf::Socket::Status::Done) {
+				AddMessageToChat(aMensajes, "Error at sending the login packet to the server!");
+			}
+			else
+			{
+				playerInfo.SetName(*parameters[1]);
+				AddMessageToChat(aMensajes, "Username setted to " + *parameters[1]);
+				AddMessageToChat(aMensajes, "Use the commands \\create or \\join to either create or join to a room!");
+				AddMessageToChat(aMensajes, "For more info \\[command] help!");
+			}
+		}
+
 		break;
 	}
 	case Messages::Msg::DADO: {
@@ -95,6 +185,29 @@ void GetChatCommand(sf::TcpSocket& serverSocket, PlayerInfo& playerInfo, std::st
 		for (int i = 0; i < cards.size(); i++) {
 			Utils::print(cards[i].print());
 		}
+	}
+	//esto deberia ser acusacion, pero quedan 30 minutos para la entrega
+	case Messages::Msg::DEDUCCION: {
+		sf::Packet acusePacket;
+		acusePacket << "DEDUCCION";
+		if (parameters.size() == 2)
+		{
+			if (*parameters[1] == "help") {
+				AddMessageToChat(aMensajes, "\\acuse [weapon] [character] [room]");
+			}
+			else {
+				AddMessageToChat(aMensajes, "Wrong usage of the command " + *parameters[0] + "! Check out " + *parameters[0] + " help");
+				break;
+			}
+		}
+		else if (parameters.size() == 4) {
+			acusePacket << static_cast<unsigned short>(Card::StringToCardName(*parameters[1])) << static_cast<unsigned short>(Card::StringToCardName(*parameters[2])) << static_cast<unsigned short>(Card::StringToCardName(*parameters[3]));
+		}
+
+		if (serverSocket.send(acusePacket) != sf::Socket::Status::Done) {
+			//algo ha ido mal 
+		}
+		break;
 	}
 	}
 }
@@ -143,7 +256,7 @@ void DrawChat(sf::TcpSocket& serverSocket, PlayerInfo& _playerInfo, std::vector<
 					sf::Packet packet;
 					std::string packetToSend = mensaje;
 					if (mensaje[0] == '\\') {
-						GetChatCommand(serverSocket, _playerInfo, mensaje);
+						GetChatCommand(serverSocket, _playerInfo, mensaje, aMensajes);
 					}
 					else {
 						packet << "MSG" << _playerInfo.GetName() << packetToSend;
@@ -223,31 +336,29 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 			{
 				unsigned short settedColor;
 				receivePacket >> settedColor;
-				Utils::print("Esta arribant al client el color: " + std::to_string(settedColor));
 				_playerInfo.SetColor(PlayerInfo::IdColorToColor(settedColor));
-				Utils::print("Lobby Created correctly");
+				AddMessageToChat(aMensajes, "Lobby created correctly");
 			}
 			else
 			{
-				Utils::print("Something went wrong trying to create a lobby");
+				AddMessageToChat(aMensajes, "Something went wrong trying to create a lobby");
 			}
 
 			break;
 		}
 		case Messages::Msg::JOIN_RESPONSE: {
-
 			bool statusRequest;
 			unsigned short numPlayersRequest;
 
 			receivePacket >> statusRequest;
 
 			if (statusRequest) {
+				AddMessageToChat(aMensajes, "Succesfully joined to the server!");
 				unsigned short settedColor;
 
 				receivePacket >> settedColor;
 				receivePacket >> startGame;
 
-				Utils::print("Esta arribant al client el color: " + std::to_string(settedColor));
 				_playerInfo.SetColor(PlayerInfo::IdColorToColor(settedColor));
 				receivePacket >> numPlayersRequest;
 
@@ -260,6 +371,35 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 					std::cout << playerName << ' ' << playerColor << std::endl;
 				}
 			}
+			else {
+				AddMessageToChat(aMensajes, "Id or pwd incorrect!");
+			}
+			break;
+		}
+		case Messages::Msg::GAMES: {
+			unsigned short numGames;
+			receivePacket >> numGames;
+
+			AddMessageToChat(aMensajes, "");
+			AddMessageToChat(aMensajes, "Available lobbys:");
+			if (numGames == 0) {
+				AddMessageToChat(aMensajes, "There isn't any lobby yet!");
+			}
+			else {
+				for (int i = 0; i < numGames; i++) {
+					std::string roomName = "";
+					unsigned short roomId = 0;
+					unsigned short currentPlayers = 0;
+					unsigned short maxPlayers = 0;
+
+					receivePacket >> roomName >> roomId >> currentPlayers >> maxPlayers;
+
+					AddMessageToChat(aMensajes, std::to_string(i + 1) + 
+						". Name: " + roomName + 
+						" Id: " + std::to_string(roomId) + 
+						" Players: " + std::to_string(currentPlayers) + '/' + std::to_string(maxPlayers));
+				}
+			}
 			break;
 		}
 		case Messages::Msg::P_JOINED:{
@@ -268,7 +408,7 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 
 			receivePacket >> startGame >> newPlayerName >> newPlayerColor;
 			players.push_back(PlayerInfo(newPlayerName, newPlayerColor));
-			Utils::print(newPlayerName + " has joined the room!");
+			AddMessageToChat(aMensajes, newPlayerName + " has joined the room!");
 		}
 		case Messages::Msg::MSG:{
 
@@ -276,10 +416,7 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 			std::string message;
 
 			receivePacket >> nickName >> message;
-			aMensajes.push_back(nickName + "> " + message);
-
-			if (aMensajes.size() > 25)
-				aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
+			AddMessageToChat(aMensajes, nickName + "> " + message);
 
 			break;
 		}
@@ -298,17 +435,22 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 			}
 
 			if (_playerInfo.GetName() == newPlayerNick) {
-				Utils::print("Esta cambiant color");
+				AddMessageToChat(aMensajes, "You have succesfully changed your color");
 				_playerInfo.SetColor(PlayerInfo::IdColorToColor(newPlayerColor));
 			}
 
 			break;
 		}
 		case Messages::Msg::DADO: {
+			std::string nickPlayer;
 			unsigned short dieThrow;
-			receivePacket >> dieThrow;
-			Utils::print(std::to_string(dieThrow));
-			_playerInfo.SetDieThrow(dieThrow);
+			receivePacket >>nickPlayer>> dieThrow;
+
+			AddMessageToChat(aMensajes, nickPlayer + " has rolled a " + std::to_string(dieThrow));
+
+			if(nickPlayer == _playerInfo.GetName())
+				_playerInfo.SetDieThrow(dieThrow);
+
 			break;
 		}
 		case Messages::Msg::START:{
@@ -325,6 +467,34 @@ void ReceivesManager(PlayerInfo& _playerInfo, sf::TcpSocket& serverSocket, bool&
 
 			_playerInfo.SetCards(*cardsHand);
 			break;
+		}
+		case Messages::Msg::RESOLVE: {
+
+			bool resolve;
+			std::string playerNick;
+			unsigned short weaponId;
+			unsigned short characterId;
+			unsigned short placeId;
+
+			receivePacket >> resolve >> playerNick;
+
+			if (resolve) 
+			{
+				receivePacket >> weaponId >> characterId >> placeId;
+
+				std::string weaponName = Card::GetCardName(weaponId);
+				std::string characterName = Card::GetCardName(characterId);
+				std::string placeName = Card::GetCardName(placeId);
+
+				AddMessageToChat(aMensajes, playerNick + " solved the crime. The crime was performed on the " + placeName + 
+					" whith a "+ weaponName + 
+					" by " + characterName);
+			}
+			else 
+			{
+				AddMessageToChat(aMensajes, playerNick + " tried to solve the crime, but was wrong!");
+			}
+
 		}
 		}
 	}
@@ -346,66 +516,12 @@ int main()
 	std::vector<std::string> aMensajes;
 	std::vector<Card> currentCards;
 
-	std::string nick;
-	std::cout << "Type your nickname: ";
-	std::cin >> nick;
-	loginPacket << "LOGIN" << nick;
-	playerInfo.SetName(nick);
+	AddMessageToChat(aMensajes, "type \\login [nickname] in order to register to the server!");
 
 	if (!ManageConnectionToServer(serverSocket)) return 1;
 
 	std::thread receiveThread(&ReceivesManager, std::ref(playerInfo), std::ref(serverSocket), std::ref(startGame), std::ref(players), std::ref(aMensajes));
 	receiveThread.detach();
-
-	serverSocket.send(loginPacket);
-
-	char answer;
-	do {
-		std::cout << "Would you like to Join a room or Create a new one? (J/C)" << std::endl;
-		std::cin >> answer;
-	} while (!IsCorrectAnswerRoom(answer));
-
-	if (answer == 'j' || answer == 'J'){
-		std::string gameId;
-		std::string password;
-		sf::Packet joinPacket;
-		sf::Packet joinPacketRequest;
-		std::string headderRequest;
-		bool statusRequest;
-		unsigned short numPlayersRequest;
-
-		std::cout << "Which room would you like to join?" << std::endl;
-		std::cin >> gameId;
-		std::cout << "Password: ";
-		std::cin >> password;
-		joinPacket << "JOIN" << gameId << password;
-		serverSocket.send(joinPacket);
-	}
-	else if (answer == 'c' || answer == 'C') 
-	{
-		std::string lobbyRoomName;
-		std::string lobbyRoomPasswd;
-		unsigned short numPlayers;
-
-		do {
-			std::cout << "Lobby name: ";
-			std::cin >> lobbyRoomName;
-		} while (lobbyRoomName.empty());
-
-		do {
-			std::cout << "Lobby passwd: ";
-			std::cin >> lobbyRoomPasswd;
-		} while (lobbyRoomPasswd.empty());
-
-		do {
-			std::cout << "Num players: ";
-			std::cin >> numPlayers;
-		} while (numPlayers < 3 || numPlayers > 6);
-
-		sf::Packet createLobbyRoomPacket;
-		createLobbyRoomPacket << "CREATE" << lobbyRoomName << lobbyRoomPasswd << numPlayers;
-		serverSocket.send(createLobbyRoomPacket);
-	}
 
 	if (!startGame) {
 		Utils::print("Waiting for other players...");

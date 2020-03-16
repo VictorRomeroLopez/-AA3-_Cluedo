@@ -40,21 +40,21 @@ private:
 	CardType cardType;
 	CardName cardName;
 
-	std::vector<std::string> cardNames{
-		"WRENCH", 
-		"CANDLESTICK", 
-		"LEADPIPE", 
-		"ROPE" , 
-		"REVOLVER", 
+	std::vector<std::string> cardNames {
+		"WRENCH",
+		"CANDLESTICK",
+		"LEADPIPE",
+		"ROPE" ,
+		"REVOLVER",
 		"KNIFE",
-		
+
 		"CELESTE",
 		"PRADO",
 		"AMAPOLA",
 		"RUBIO",
 		"BLANCO",
 		"MORA",
-		
+
 		"INVERNADERO",
 		"SALABILLAR",
 		"BIBLIOTECA",
@@ -75,5 +75,7 @@ public:
 	CardType GetType();
 	CardName GetName();
 	std::string print();
+	static std::string GetCardName(unsigned short);
+	static CardName StringToCardName(std::string cardName);
 
 };

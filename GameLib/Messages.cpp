@@ -36,5 +36,6 @@ Messages::Msg Messages::IsChatMessage(std::string message) {
 	else if (message == "\\roll") return Messages::Msg::DADO;
 	else if (message == "\\clue") return Messages::Msg::PISTA;
 	else if (message == "\\cards") return Messages::Msg::START;
+	else if (message == "\\acuse") return Messages::Msg::DEDUCCION;
 	else return Messages::Msg::NONE;
 }
