@@ -51,7 +51,6 @@ void PeerListener(Player* player, LobbyRoom& lobbyRoom) {
 
 void ReceivesManager(PlayerInfo& _playerInfo, std::vector<Player>& players, int peerID, LobbyRoom& lobbyRoom, unsigned int random) {
 	bool connectedToPeer = true;
-	srand(random);
 	while (connectedToPeer) {
 		sf::Packet receivePacket;
 		sf::Socket::Status peerStatus;
@@ -86,6 +85,12 @@ void ReceivesManager(PlayerInfo& _playerInfo, std::vector<Player>& players, int 
 			break;
 		}
 		case Messages::Msg::DADO: {
+			int status;
+			receivePacket >> status;
+
+			if(status !=0)
+				lobbyRoom.NextTurn();
+
 			players[peerID].info.SetDieThrow(lobbyRoom.RollDie());
 			std::cout << "Dado de " << players[peerID].info.GetName() << " : " << players[peerID].info.GetDieThrow() << std::endl;
 			break;
@@ -95,21 +100,21 @@ void ReceivesManager(PlayerInfo& _playerInfo, std::vector<Player>& players, int 
 			std::string name;
 			int idPlayer;
 			receivePacket >> name;
-
 			Card::CardName cardName = _playerInfo.StringToCardName(name);
 			lobbyRoom.EraseClueCard(cardName);
-
 			receivePacket >> idPlayer;
 
 			if(idPlayer != -1)
 				std::cout << "La carta " << name << " la tiene: " << players[idPlayer].info.GetName() << std::endl;
 			else
-				std::cout << "La carta que ha descubierto "<<players[idPlayer].info.GetName() << " es: " << name << ". Esta dentro del sobre! " << std::endl;
+				std::cout << "La carta que se ha descubierto es: " << name << ". Esta dentro del sobre! " << std::endl;
+
+			lobbyRoom.NextTurn();
 
 			break;
 			}
+								 
 		}
-		lobbyRoom.NextTurn();
 	}
 }
 
@@ -138,27 +143,19 @@ std::vector<std::string*> GetParameters(std::string str)
 void GetChatCommand(std::vector<Player>& players, PlayerInfo& playerInfo, std::string _message, short myPlayerOrder, LobbyRoom& lobbyRoom, unsigned int random) {
 	sf::Packet packetCommand;
 	std::vector<std::string*> parameters = GetParameters(_message);
-	srand(random);
 	switch (Messages::IsChatMessage(*parameters[0])) {
 			
 		case Messages::Msg::DADO: {
 			packetCommand << "DADO";
-			for (int i = 0; i < players.size(); i++)
-			{
-				if (i != myPlayerOrder)
-				{
-					if (players[i].tcpSocket->send(packetCommand) == sf::Socket::Done) {
-						Utils::print("se ha enviado el dado");
-						
-					}
-				}
-			}
-			players[myPlayerOrder].info.SetDieThrow(1);
+			
+			players[myPlayerOrder].info.SetDieThrow(LobbyRoom::RollDie());
 			std::cout << "Te ha tocado un " << players[myPlayerOrder].info.GetDieThrow() << std::endl;
 
 			if (players[myPlayerOrder].info.GetDieThrow() == 1)
 			{
 				short type = rand() % 3;
+					std::cout <<type << std::endl;
+
 				if (type == 0)
 				{
 					std::cout << "Pista! Escoge una carta del tipo ARMA con el comando \\clue y la carta deseada: " << std::endl;
@@ -174,9 +171,24 @@ void GetChatCommand(std::vector<Player>& players, PlayerInfo& playerInfo, std::s
 					std::cout << "Pista! Escoge una carta del tipo LUGAR con el comando \\clue y la carta deseada: " << std::endl;
 					playerInfo.SetClueCardType(Card::CardType::ROOM);
 				}
+				packetCommand << 0;
 			}
 			else
+			{
 				lobbyRoom.NextTurn();
+				packetCommand << 1;
+			}
+
+			for (int i = 0; i < players.size(); i++)
+			{
+				if (i != myPlayerOrder)
+				{
+					if (players[i].tcpSocket->send(packetCommand) == sf::Socket::Done) {
+						Utils::print("se ha enviado el dado");
+
+					}
+				}
+			}
 
 			break;
 		}	
@@ -185,20 +197,21 @@ void GetChatCommand(std::vector<Player>& players, PlayerInfo& playerInfo, std::s
 			std::vector<Card> cards = lobbyRoom.GetClueCards();
 			std::vector<Card> playerCards;
 			int idPlayer;
+			bool found = false;
 			for (int i = 0; i < cards.size(); i++)
 			{
 				if (cards[i].GetName() == name)
 				{
 					if (cards[i].GetType() == playerInfo.GetClueCardType())
 					{
-						bool found = false;
+						
 						for (int j = 0; j < players.size(); j++)
 						{
 							playerCards = players[j].info.GetCards();
 							for (int k = 0; k < playerCards.size(); k++)
 							{
 								if (playerCards[k].GetName() == name) {
-									std::cout << "La carta " << *parameters[1] << "la tiene: " << players[j].info.GetName() << std::endl;
+									std::cout << "La carta " << *parameters[1] << " la tiene: " << players[j].info.GetName() << std::endl;
 									found = true;
 									idPlayer = j; 
 									lobbyRoom.EraseClueCard(name);
@@ -208,9 +221,10 @@ void GetChatCommand(std::vector<Player>& players, PlayerInfo& playerInfo, std::s
 						}
 						if (!found)
 						{
-							std::cout << "La carta " << *parameters[1] << "esta dentro del sobre! " << std::endl;
+							std::cout << "La carta " << *parameters[1] << " esta dentro del sobre! " << std::endl;
 							lobbyRoom.EraseClueCard(name);
 							idPlayer = -1;
+							found = true;
 						}
 
 
@@ -236,6 +250,8 @@ void GetChatCommand(std::vector<Player>& players, PlayerInfo& playerInfo, std::s
 						std::cout << "Esta carta no forma parte del tipo que te he pedido!" << std::endl;
 				}
 			}
+			if (!found)
+				Utils::print("¡Esta carta no existe o ya se ha descubierto con una pista!");
 		}
 	}
 }
