@@ -24,7 +24,7 @@ c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamecli
               T=float
           ]
 c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gamelib\utils.h(10): warning C4091: 'static ': ignored on left of 'Utils' when no variable is declared
-c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gameclientpeer\mainclientpeer.cpp(268): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
+c:\users\andre\onedrive\escritorio\treballs\3er curs\xarxes\-aa3-_cluedo\gameclientpeer\mainclientpeer.cpp(414): warning C4244: 'argument': conversion from 'size_t' to 'T', possible loss of data
           with
           [
               T=float

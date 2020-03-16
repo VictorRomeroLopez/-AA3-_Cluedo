@@ -330,7 +330,7 @@ int main()
 
 	for (int i = 0; i < peers.size(); i++)
 	{
-		std::cout << peers[i].info.GetIdColor() << std::endl;
+		std::cout <<"ID COLOR: " <<peers[i].info.GetIdColor() << std::endl;
 	}
 
 	std::map<short, std::vector<Card>> cardsMap;
