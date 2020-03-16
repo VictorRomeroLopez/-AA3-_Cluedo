@@ -45,6 +45,6 @@ public:
 	static Color GetRandomColor();
 	static Color IdColorToColor(unsigned short);
 	static unsigned short ColorToIdColor(Color);
-	static bool PlayerInfo::ColorStringToIdColor(unsigned short& _idColor, std::string colorString);
+	static bool ColorStringToIdColor(unsigned short& _idColor, std::string colorString);
 
 };

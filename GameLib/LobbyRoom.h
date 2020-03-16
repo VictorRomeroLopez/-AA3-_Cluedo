@@ -47,5 +47,6 @@ public:
 	Card DrawCard(Card::CardType);
 	void SetupEnvelope();
 	void SendCards();
+	std::map<short, std::vector<Card>> SetPeersCards();
 };
 

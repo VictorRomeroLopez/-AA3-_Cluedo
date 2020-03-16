@@ -213,3 +213,34 @@ void LobbyRoom::SendCards()
 		}
 	}
 }
+
+std::map<short, std::vector<Card>> LobbyRoom::SetPeersCards()
+{
+
+	std::map<short, std::vector<Card>> cards;
+	std::vector<unsigned short> numOfCardsPerStack;
+	int numCards = 18;
+
+	for (short i = 0; i < playersSocket.size(); i++) {
+		numOfCardsPerStack.push_back(0);
+		numOfCardsPerStack[i] = 18 / playersSocket.size();
+		numCards -= 18 / playersSocket.size();
+	}
+
+	for (int i = 0; numCards > 0;i++)
+	{
+		numOfCardsPerStack[i]++;
+		numCards--;
+	}
+
+	for (short i = 0; i < playersSocket.size(); i++) {	
+		
+		for (int j = 0; j < numOfCardsPerStack[i]; j++) {
+			Card card = DrawCard();
+			cards[i].push_back(card);
+		}
+
+	}
+	std::cout << playersSocket.size() << ", " << numOfCardsPerStack.size() << ", " << cards.size() << std::endl;
+	return cards;
+}
