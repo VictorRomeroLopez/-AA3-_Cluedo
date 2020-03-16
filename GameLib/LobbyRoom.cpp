@@ -226,13 +226,13 @@ std::map<short, std::vector<Card>> LobbyRoom::SetPeersCards()
 		numOfCardsPerStack[i] = 18 / playersSocket.size();
 		numCards -= 18 / playersSocket.size();
 	}
-
+	std::cout << "numCards: " << numCards << std::endl;
 	for (int i = 0; numCards > 0;i++)
 	{
 		numOfCardsPerStack[i]++;
 		numCards--;
 	}
-
+	Utils::print("gucci");
 	for (short i = 0; i < playersSocket.size(); i++) {	
 		
 		for (int j = 0; j < numOfCardsPerStack[i]; j++) {
@@ -241,6 +241,6 @@ std::map<short, std::vector<Card>> LobbyRoom::SetPeersCards()
 		}
 
 	}
-	std::cout << playersSocket.size() << ", " << numOfCardsPerStack.size() << ", " << cards.size() << std::endl;
+	std::cout << playersSocket.size()+1 << ", " << numOfCardsPerStack.size() << ", " << cards[0].size() <<", "<<cards[1].size() << std::endl;
 	return cards;
 }
